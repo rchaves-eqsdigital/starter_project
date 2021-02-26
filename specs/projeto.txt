@@ -1,0 +1,5 @@
+Login
+Auth
+Frontend: Angular
+Backend: Go
+Ver página de sensores, poder adicionar sensores, ver stats, etc.
