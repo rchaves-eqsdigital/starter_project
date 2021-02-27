@@ -23,10 +23,7 @@ func main() {
 	err = Init_sensor_db()
 	F_err(err)
 
-	/*
-		sensors, _ := ListSensors()
-		for _, v := range sensors {
-			log.Println(v)
-		}
-	*/
+	sensors, _ := ListSensors()
+	log.Println("Number of sensors:", len(sensors))
+
 }

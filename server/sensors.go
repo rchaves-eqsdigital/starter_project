@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type Sensor struct {
@@ -36,7 +37,9 @@ var s_db *gorm.DB
 // Required before using the DB
 func Init_sensor_db() error {
 	var err error
-	s_db, err = gorm.Open(sqlite.Open("db/sensors.db"), &gorm.Config{})
+	s_db, err = gorm.Open(sqlite.Open("db/sensors.db"), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	F_err(err)
 
 	// Enabling Write Ahead Logging, instead of Journaling
@@ -72,8 +75,9 @@ func loadDataset() {
 	}
 	defer file.Close()
 
-	buffer_max_size := 40000
+	buffer_max_size := 2048
 	lines := make([]Sensor, 0, buffer_max_size) // Buffer for batch insert
+	// TODO: use worker-pools for faster(?) writing dataset to DB
 
 	scanner := bufio.NewScanner(file)
 	scanner.Scan() // Skip first CSV line
@@ -105,8 +109,9 @@ func loadDataset() {
 					// Flush
 					tmp := make([]Sensor, len(lines))
 					copy(tmp, lines)
-					go CreateSensorBatch(&tmp)
-					lines = nil // clear slice
+					log.Printf("Writing %d lines\n", len(tmp))
+					CreateSensorBatch(&tmp)
+					lines = make([]Sensor, 0, buffer_max_size) // clear slice
 				}
 			default:
 				F_err(errors.New("shouldn't be here!"))
@@ -114,7 +119,7 @@ func loadDataset() {
 		}
 	}
 	if len(lines) > 0 {
-		//CreateSensorBatch(&lines)
+		CreateSensorBatch(&lines)
 	}
 }
 
