@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"./errs"
+
 	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -17,7 +19,6 @@ import (
 )
 
 type Sensor struct {
-	gorm.Model
 	ID     string
 	RoomID string
 	Date   time.Time
@@ -40,23 +41,20 @@ func Init_sensor_db() error {
 	s_db, err = gorm.Open(sqlite.Open("db/sensors.db"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
-	F_err(err)
+	errs.F_err(err)
 
 	// Enabling Write Ahead Logging, instead of Journaling
 	// which uses database-level lockinkg
 	err = s_db.Exec("PRAGMA journal_mode=WAL;").Error // Enabling Write Ahead Logging,
-	F_err(err)
+	errs.F_err(err)
 
 	err = s_db.AutoMigrate(&Sensor{})
-	F_err(err)
+	errs.F_err(err)
 
 	var count int64
 	s_db.Model(&Sensor{}).Count(&count)
 	if count == 0 {
-		start := time.Now()
 		loadDataset()
-		elapsed := time.Since(start)
-		log.Printf("Dataset load took %s", elapsed)
 	}
 
 	return nil
@@ -67,12 +65,10 @@ func Init_sensor_db() error {
 // Date format:08-12-2018 09:29
 func loadDataset() {
 	log.Println("Loading dataset.")
-	defer log.Println("Finished loading dataset.")
+	start_t := time.Now()
 	fname := "db/IOT-temp.csv"
 	file, err := os.Open(fname)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	errs.F_err(err)
 	defer file.Close()
 
 	buffer_max_size := 2048
@@ -93,12 +89,12 @@ func loadDataset() {
 				date_layout := "02-01-2006 15:04"
 				s.Date, err = time.Parse(date_layout, v)
 				if err != nil {
-					Warn("Bad date. Expected " + date_layout + ", got " + v)
+					errs.Warn("Bad date. Expected " + date_layout + ", got " + v)
 				}
 			case 3:
 				s.Temp, err = strconv.Atoi(v)
 				if err != nil {
-					Warn("temperature value not int")
+					errs.Warn("temperature value not int")
 				}
 			case 4:
 				s.In = v
@@ -106,21 +102,22 @@ func loadDataset() {
 				// Last field, Sensor struct ready.
 				lines = append(lines, s)
 				if len(lines) == cap(lines) {
-					// Flush
+					// Flush sensors to DB
 					tmp := make([]Sensor, len(lines))
 					copy(tmp, lines)
-					log.Printf("Writing %d lines\n", len(tmp))
 					CreateSensorBatch(&tmp)
 					lines = make([]Sensor, 0, buffer_max_size) // clear slice
 				}
 			default:
-				F_err(errors.New("shouldn't be here!"))
+				errs.F_err(errors.New("shouldn't be here!"))
 			}
 		}
 	}
 	if len(lines) > 0 {
 		CreateSensorBatch(&lines)
 	}
+	elapsed_t := time.Since(start_t)
+	log.Printf("Finished loading dataset: %s", elapsed_t)
 }
 
 // Creates a new sensor in the DB
