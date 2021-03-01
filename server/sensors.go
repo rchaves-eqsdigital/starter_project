@@ -33,28 +33,28 @@ func (s Sensor) String() string {
 /////////////////////////////////////////////////
 //////////////////// DB /////////////////////////
 /////////////////////////////////////////////////
-var s_db *gorm.DB
+// FIXME: removed s_db from here
 
 // Required before using the DB
-func Init_sensor_db() error {
+func (a *App) Init_sensor_db() error {
 	var err error
-	s_db, err = gorm.Open(sqlite.Open("db/sensors.db"), &gorm.Config{
+	a.DB_s, err = gorm.Open(sqlite.Open("db/sensors.db"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	errs.F_err(err)
 
 	// Enabling Write Ahead Logging, instead of Journaling
 	// which uses database-level lockinkg
-	err = s_db.Exec("PRAGMA journal_mode=WAL;").Error // Enabling Write Ahead Logging,
+	err = a.DB_s.Exec("PRAGMA journal_mode=WAL;").Error // Enabling Write Ahead Logging,
 	errs.F_err(err)
 
-	err = s_db.AutoMigrate(&Sensor{})
+	err = a.DB_s.AutoMigrate(&Sensor{})
 	errs.F_err(err)
 
 	var count int64
-	s_db.Model(&Sensor{}).Count(&count)
+	a.DB_s.Model(&Sensor{}).Count(&count)
 	if count == 0 {
-		loadDataset()
+		a.loadDataset()
 	}
 
 	return nil
@@ -63,7 +63,7 @@ func Init_sensor_db() error {
 // Reads dataset from file and loads it into the DB
 // CSV format: id,room_id/id,noted_date,temp,out/in
 // Date format:08-12-2018 09:29
-func loadDataset() {
+func (a *App) loadDataset() {
 	start_t := time.Now()
 	fname := "db/IOT-temp.csv"
 	file, err := os.Open(fname)
@@ -77,7 +77,7 @@ func loadDataset() {
 	jobs := make(chan []Sensor)
 	done := make(chan int)
 	for w := 1; w <= workers; w++ {
-		go workerThread(w, jobs, done)
+		go workerThread(a, w, jobs, done)
 	}
 
 	scanner := bufio.NewScanner(file)
@@ -120,7 +120,7 @@ func loadDataset() {
 	close(jobs)
 	// Last batch if there is leftover data
 	if len(lines) > 0 {
-		CreateSensorBatch(&lines)
+		a.CreateSensorBatch(&lines)
 	}
 	// Wait for workers to end (join)
 	for workers_done := 0; workers_done < workers; {
@@ -134,50 +134,50 @@ func loadDataset() {
 	log.Printf("Finished loading dataset: %s", elapsed_t)
 }
 
-func workerThread(w int, jobs <-chan []Sensor, done chan<- int) {
+func workerThread(a *App, w int, jobs <-chan []Sensor, done chan<- int) {
 	for v := range jobs {
 		tmp := make([]Sensor, len(v))
 		copy(tmp, v)
-		CreateSensorBatch(&tmp)
+		a.CreateSensorBatch(&tmp)
 	}
 	done <- w
 }
 
 // Creates a new sensor in the DB
-func CreateSensorNew(id string, room string, date time.Time, temp int, in string) error {
-	return s_db.Create(&Sensor{ID: id, RoomID: room, Date: date, Temp: temp, In: in}).Error
+func (a *App) CreateSensorNew(id string, room string, date time.Time, temp int, in string) error {
+	return a.DB_s.Create(&Sensor{ID: id, RoomID: room, Date: date, Temp: temp, In: in}).Error
 }
 
 // Creates a sensor in the DB from existing struct
-func CreateSensor(s *Sensor) error {
-	return s_db.Create(s).Error
+func (a *App) CreateSensor(s *Sensor) error {
+	return a.DB_s.Create(s).Error
 }
 
-func CreateSensorBatch(s *[]Sensor) error {
-	return s_db.Create(s).Error
+func (a *App) CreateSensorBatch(s *[]Sensor) error {
+	return a.DB_s.Create(s).Error
 }
 
-func ListSensors() ([]Sensor, error) {
+func (a *App) ListSensors() ([]Sensor, error) {
 	var sensors []Sensor
-	err := s_db.Find(&sensors).Error
+	err := a.DB_s.Find(&sensors).Error
 	return sensors, err
 }
 
-func DeleteSensor(id string) error {
+func (a *App) DeleteSensor(id string) error {
 	var sensor Sensor
-	err := s_db.First(&sensor, 1).Error
+	err := a.DB_s.First(&sensor, 1).Error
 	if err != nil {
 		log.Fatalln("couldn't find sensor with ID", id)
 	}
 
-	err = s_db.Delete(&sensor, 1).Error
+	err = a.DB_s.Delete(&sensor, 1).Error
 	if err != nil {
 		log.Fatalln("couldn't delete sensor", sensor)
 	}
 	return nil
 }
 
-func UpdateSensor() error {
+func (a *App) UpdateSensor() error {
 	return nil
 }
 

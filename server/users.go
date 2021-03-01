@@ -27,30 +27,31 @@ func (u *User) String() string {
 
 // LOGIN / LOGOUT? token, cookies, etc etc
 // - Sessão c/ UUID (guardar em BE dados como data de acesso, IP, etc.)
-// - JWT - https://jwt.io/ - ver isto
 func Login(email string, hash []byte) error {
-	/*
-		if user in sessions{
-			return errors.New("user already logged in")
-		}
-		if user in users {
-			return newSession(email,hash)
-		}else{
-			return errors.New("invalid user")
-		}
-	*/
+	// Check if user already has an active session
+	_, err := sessionGet_email(email)
+	if err != nil {
+		return err // user already logged in
+	}
+
+	err = newSession(email, hash)
+	if err != nil {
+		return err // invalid email/password
+	}
 	return nil
 }
 
-// Logs out and invalidates session/JWT
+// Logs out and invalidates session
 func Logout(email string) error {
-	/*
-		if user in sessions {
-			return sessionInvalidate(tok string)
-		}else{
-			return errors.New("user not logged in")
-		}
-	*/
+	// Check if user is logged in
+	session, err := sessionGet_email(email)
+	if err != nil {
+		return err
+	}
+	err = sessionInvalidate(session.Tok)
+	if err != nil {
+		return err // user not logged in
+	}
 	return nil
 }
 
@@ -58,41 +59,48 @@ func Logout(email string) error {
 //////////////////// DB /////////////////////////
 /////////////////////////////////////////////////
 
-var u_db *gorm.DB
+// FIXME: removed u_db from here
 
-func Init_user_db() error {
-	u_db, err := gorm.Open(sqlite.Open("db/users.db"), &gorm.Config{
+func (a *App) Init_user_db() error {
+	var err error
+	a.DB_u, err = gorm.Open(sqlite.Open("db/users.db"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	errs.F_err(err)
 
-	return u_db.AutoMigrate(&User{})
+	return a.DB_u.AutoMigrate(&User{})
 }
 
 // Creates a new user/account
-func CreateUser(email string, hash []byte) error {
-	u_db.Create(&User{Email: email, Password: hash})
+func (a *App) CreateUser(email string, hash []byte) error {
+	a.DB_u.Create(&User{Email: email, Password: hash})
 	return nil
 }
 
-func ListUsers() ([]User, error) {
+func (a *App) ListUsers() ([]User, error) {
 	var users []User
-	err := u_db.Find(&users).Error
+	err := a.DB_u.Find(&users).Error
 	return users, err
 }
 
-func DeleteUser(email string) error {
+func (a *App) DeleteUser(email string) error {
 	var user User
-	err := u_db.First(&user, 1).Error
+	err := a.DB_u.First(&user, 1).Error
 	errs.F_err(err)
 
-	err = u_db.Delete(&user, 1).Error
+	err = a.DB_u.Delete(&user, 1).Error
 	errs.F_err(err)
 	return nil
 }
 
-func sessionGet(email string) error {
-	return nil
+// Takes session token, returns (Session,error)
+func sessionGet_tok(tok string) (*Session, error) {
+	return nil, nil
+}
+
+// Takes user's email, returns (Session,error)
+func sessionGet_email(email string) (*Session, error) {
+	return nil, nil
 }
 
 func sessionInvalidate(tok string) error {

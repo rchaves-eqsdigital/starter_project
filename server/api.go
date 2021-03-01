@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func Init_api() {
+func (a App) Run() {
 	http.HandleFunc("/api/v0/login/", apiLogin)
 	http.HandleFunc("/api/v0/logout/", apiLogout)
 	http.HandleFunc("/api/v0/sensor/", apiSensor)                // list all sensors
