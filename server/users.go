@@ -59,8 +59,6 @@ func Logout(email string) error {
 //////////////////// DB /////////////////////////
 /////////////////////////////////////////////////
 
-// FIXME: removed u_db from here
-
 func (a *App) Init_user_db() error {
 	var err error
 	a.DB_u, err = gorm.Open(sqlite.Open("db/users.db"), &gorm.Config{
