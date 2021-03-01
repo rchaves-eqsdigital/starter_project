@@ -11,16 +11,47 @@ type User struct {
 	gorm.Model
 	Email    string
 	Password []byte
+	Tok      string
 }
 
 type Session struct {
 	gorm.Model
-	user User
-	tok  string
+	U     User
+	Tok   string
+	Valid bool
 }
 
 func (u *User) String() string {
 	return u.Email + ":" + string(u.Password)
+}
+
+// LOGIN / LOGOUT? token, cookies, etc etc
+// - Sessão c/ UUID (guardar em BE dados como data de acesso, IP, etc.)
+// - JWT - https://jwt.io/ - ver isto
+func Login(email string, hash []byte) error {
+	/*
+		if user in sessions{
+			return errors.New("user already logged in")
+		}
+		if user in users {
+			return newSession(email,hash)
+		}else{
+			return errors.New("invalid user")
+		}
+	*/
+	return nil
+}
+
+// Logs out and invalidates session/JWT
+func Logout(email string) error {
+	/*
+		if user in sessions {
+			return sessionInvalidate(tok string)
+		}else{
+			return errors.New("user not logged in")
+		}
+	*/
+	return nil
 }
 
 /////////////////////////////////////////////////
@@ -60,18 +91,25 @@ func DeleteUser(email string) error {
 	return nil
 }
 
-// LOGIN / LOGOUT? token, cookies, etc etc
-// - Sessão c/ UUID (guardar em BE dados como data de acesso, IP, etc.)
-// - JWT - https://jwt.io/ - ver isto
-func Login(email string, hash []byte) error {
+func sessionGet(email string) error {
 	return nil
 }
 
-// Logs out and invalidates session/JWT
-func Logout() {
+func sessionInvalidate(tok string) error {
+	return nil
+}
 
+func sessionIsValid(tok string) error {
+	return nil
 }
 
 func newSession(email string, hash []byte) error {
+	/*
+		if hash matches user{
+			u_db.Create(&Session{})
+		}else{
+			return errors.New("invalid credentials")
+		}
+	*/
 	return nil
 }

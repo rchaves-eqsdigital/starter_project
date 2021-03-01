@@ -64,7 +64,6 @@ func Init_sensor_db() error {
 // CSV format: id,room_id/id,noted_date,temp,out/in
 // Date format:08-12-2018 09:29
 func loadDataset() {
-	log.Println("Loading dataset.")
 	start_t := time.Now()
 	fname := "db/IOT-temp.csv"
 	file, err := os.Open(fname)
@@ -74,6 +73,7 @@ func loadDataset() {
 	const buffer_max_size = 4096
 	lines := make([]Sensor, 0, buffer_max_size) // Buffer for batch insert
 	const workers = 4
+	log.Printf("Loading dataset using %d bytes buffers and %d workers\n", buffer_max_size, workers)
 	jobs := make(chan []Sensor)
 	done := make(chan int)
 	for w := 1; w <= workers; w++ {

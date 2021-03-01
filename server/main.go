@@ -16,4 +16,6 @@ func main() {
 	sensors, _ := ListSensors()
 	log.Println("Number of sensors:", len(sensors))
 
+	Init_api()
+
 }
