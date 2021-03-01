@@ -71,9 +71,14 @@ func loadDataset() {
 	errs.F_err(err)
 	defer file.Close()
 
-	buffer_max_size := 2048
+	const buffer_max_size = 4096
 	lines := make([]Sensor, 0, buffer_max_size) // Buffer for batch insert
-	// TODO: use worker-pools for faster(?) writing dataset to DB
+	const workers = 4
+	jobs := make(chan []Sensor)
+	done := make(chan int)
+	for w := 1; w <= workers; w++ {
+		go workerThread(w, jobs, done)
+	}
 
 	scanner := bufio.NewScanner(file)
 	scanner.Scan() // Skip first CSV line
@@ -102,10 +107,8 @@ func loadDataset() {
 				// Last field, Sensor struct ready.
 				lines = append(lines, s)
 				if len(lines) == cap(lines) {
-					// Flush sensors to DB
-					tmp := make([]Sensor, len(lines))
-					copy(tmp, lines)
-					CreateSensorBatch(&tmp)
+					// Flush sensors to DB workers
+					jobs <- lines
 					lines = make([]Sensor, 0, buffer_max_size) // clear slice
 				}
 			default:
@@ -113,11 +116,31 @@ func loadDataset() {
 			}
 		}
 	}
+	// Signal workers to end
+	close(jobs)
+	// Last batch if there is leftover data
 	if len(lines) > 0 {
 		CreateSensorBatch(&lines)
 	}
+	// Wait for workers to end (join)
+	for workers_done := 0; workers_done < workers; {
+		//log.Printf("worker-%d done\n", <-done)
+		<-done
+		workers_done += 1
+	}
+	close(done)
+
 	elapsed_t := time.Since(start_t)
 	log.Printf("Finished loading dataset: %s", elapsed_t)
+}
+
+func workerThread(w int, jobs <-chan []Sensor, done chan<- int) {
+	for v := range jobs {
+		tmp := make([]Sensor, len(v))
+		copy(tmp, v)
+		CreateSensorBatch(&tmp)
+	}
+	done <- w
 }
 
 // Creates a new sensor in the DB
