@@ -1,0 +1,17 @@
+.topnav {
+    background-color: var(--dark-gray-5);
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+.topnav a {
+    float: right;
+    display: block;
+    color: var(--dark-gray-1);
+    text-align: center;
+    padding: 14px;
+    text-decoration: none;
+    font-size: 17px;
+}
