@@ -1,52 +1,207 @@
+:root{
+    --brand-normal: #FE7B06;
+    --brand-hover: #FE9639;
+    
+    --dark-gray-1: #FAFAFA;
+    --dark-gray-2: #8F90A6;
+    --dark-gray-3: #595B70;
+    --dark-gray-4: #3E4057;
+    --dark-gray-5: #313D4F;
+    --dark-gray-6: #222C3C;
+    --dark-gray-7: #282A39;
+    --dark-gray-8: #222437;
+    --dark-dark:#1C1C28;
 
-body  
-{  
-    margin: 0;  
-    padding: 0;  
-    background-color:#6abadeba;  
-    font-family: 'Arial';  
-}  
-.login{  
-        width: 382px;  
-        overflow: hidden;  
-        margin: auto;  
-        margin: 20 0 0 450px;  
-        padding: 80px;  
-        background: #c6e92c;  
-        border-radius: 15px ;  
-            
-}  
-h2{  
-    text-align: center;  
-    color: #3c3fff;
-    padding: 20px;
-}  
-label{  
-    color: #f82222;  
-    font-size: 17px;  
-}  
-.input{  
-    width: 300px;  
-    height: 30px;  
-    border: none;  
-    border-radius: 3px;  
-    padding-left: 8px;  
+    --success-normal: #56BD5B;
+    --success-hover: #3E9645;
 }
-#log{  
-    width: 300px;  
-    height: 30px;  
-    border: none;  
-    border-radius: 17px;  
-    padding-left: 7px;  
-    color: blue;  
-    
-    
-}  
-span{  
-    color: white;  
-    font-size: 17px;  
-}  
-a{  
-    float: right;  
-    background-color: grey;  
-}  
+
+body{
+    font-family: 'Open Sans', sans-serif;
+    background: var(--dark-dark);
+    margin: 0 auto 0 auto;  
+    width:100%; 
+    text-align:center;
+    margin: 20px 0px 20px 0px;
+    --l: 3.5em;
+}
+
+p{
+    font-size:12px;
+    text-decoration: none;
+    color: var(--dark-gray-1);
+}
+
+h2{
+    font-size:1.5em;
+    color: var(--dark-gray-5);
+}
+
+.box{
+    background: var(--dark-gray-1);
+    width:300px;
+    border-radius:6px;
+    margin: 0 auto 0 auto;
+    padding:0px 0px 70px 0px;
+    border: var(--dark-gray-2) 4px solid; 
+}
+
+.email{
+    background: var(--dark-gray-1);
+    border: var(--dark-gray-2) 1px solid;
+    border-bottom: var(--dark-gray-2) 2px solid;
+    padding: 8px;
+    width:250px;
+    color: var(--dark-gray-2);
+    margin-top:10px;
+    font-size:1em;
+    border-radius:4px;
+}
+
+.btn{
+    background:var(--brand-normal);
+    width:125px;
+    padding-top:5px;
+    padding-bottom:5px;
+    color:var(--dark-gray-1);
+    border-radius:4px;
+    border: var(--brand-hover) 1px solid;
+
+    margin-top:20px;
+    margin-bottom:20px;
+    float:left;
+    margin-left:16px;
+    font-weight:800;
+    font-size:0.8em;
+}
+
+.btn:hover{
+    background: var(--brand-hover); 
+}
+
+#btn2{
+    float:left;
+    background:var(--dark-gray-5);
+    width:125px;  padding-top:5px;
+    padding-bottom:5px;
+    color:var(--dark-gray-1);
+    border-radius:4px;
+    border: var(--dark-gray-3) 1px solid;
+
+    margin-top:20px;
+    margin-bottom:20px;
+    margin-left:10px;
+    font-weight:800;
+    font-size:0.8em;
+}
+
+#btn2:hover{ 
+    background:var(--dark-gray-3); 
+}
+
+/********** NAV **********/
+/* Add a black background color to the bottom navigation */
+.nav {
+    background-color: var(--dark-gray-5);
+    overflow: hidden;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+/* Style the links inside the navigation bar */
+.nav a {
+    float: left;
+    display: block;
+    color: var(--dark-gray-1);
+    text-align: center;
+    padding: 14px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.nav a:hover {
+    background-color: var(--dark-gray-6);
+    color: var(--dark-gray-2);
+}
+
+/* Add a color to the active/current link */
+.nav a.active {
+    background-color: var(--dark-gray-2);
+    color: var(--dark-gray-5);
+}
+
+.nav .icon {
+    display: none;
+}
+
+/********** TOP NAV **********/
+.topnav {
+    background-color: var(--dark-gray-5);
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+    float: right;
+    display: block;
+    color: var(--dark-gray-1);
+    text-align: center;
+    padding: 14px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+
+
+
+
+
+
+
+
+
+
+/******** FLOATING BUTTON ********/
+.triggerButton { display: none; }
+
+.triggerButton + label {
+    cursor: pointer;
+    position: absolute;
+    right: 1em;
+    bottom: 1em;
+    background-color: tomato;
+    height: var(--l);
+    width: var(--l);
+    border-radius: 50%;
+    z-index: 2;
+}
+
+.triggerButton + label:before, .triggerButton + label:after {
+    position: absolute;
+    content: '';
+    height: calc(var(--l) / 2 );
+    width: .25em;
+    background-color: #fff;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    border-radius: .5em;
+    transition: all .25s;
+}
+
+.triggerButton + label:before {
+    height: calc(var(--l) / 2 );
+    width: .25em;
+}
+
+.triggerButton + label:after {
+    width: calc(var(--l) / 2 );
+    height: .25em;
+}

@@ -21,6 +21,10 @@ import (
 type Sensor struct {
 	ID     string
 	RoomID string
+	data []DataEntry
+}
+
+type DataEntry struct {
 	Date   time.Time
 	Temp   int
 	In     string // "In", "Out"

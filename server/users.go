@@ -1,7 +1,12 @@
 package main
 
 import (
+	"bytes"
+	"errors"
+	"fmt"
+
 	"./errs"
+	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -27,14 +32,14 @@ func (u *User) String() string {
 
 // LOGIN / LOGOUT? token, cookies, etc etc
 // - Sessão c/ UUID (guardar em BE dados como data de acesso, IP, etc.)
-func Login(email string, hash []byte) error {
+func (a *App) Login(email string, hash []byte) error {
 	// Check if user already has an active session
-	_, err := sessionGet_email(email)
+	_, err := a.sessionGet_email(email)
 	if err != nil {
 		return err // user already logged in
 	}
 
-	err = newSession(email, hash)
+	err = a.newSession(email, hash)
 	if err != nil {
 		return err // invalid email/password
 	}
@@ -42,13 +47,13 @@ func Login(email string, hash []byte) error {
 }
 
 // Logs out and invalidates session
-func Logout(email string) error {
+func (a *App) Logout(email string) error {
 	// Check if user is logged in
-	session, err := sessionGet_email(email)
+	session, err := a.sessionGet_email(email)
 	if err != nil {
 		return err
 	}
-	err = sessionInvalidate(session.Tok)
+	err = a.sessionInvalidate(session.Tok)
 	if err != nil {
 		return err // user not logged in
 	}
@@ -66,7 +71,7 @@ func (a *App) Init_user_db() error {
 	})
 	errs.F_err(err)
 
-	return a.DB_u.AutoMigrate(&User{})
+	return a.DB_u.AutoMigrate(&User{}, &Sensor{})
 }
 
 // Creates a new user/account
@@ -81,6 +86,12 @@ func (a *App) ListUsers() ([]User, error) {
 	return users, err
 }
 
+func (a *App) ListUsers_email(email string) ([]User, error) {
+	var users []User
+	err := a.DB_u.Where("Email LIKE ?", fmt.Sprintf("%%%s%%", email)).Find(&users).Error
+	return users, err
+}
+
 func (a *App) DeleteUser(email string) error {
 	var user User
 	err := a.DB_u.First(&user, 1).Error
@@ -92,30 +103,48 @@ func (a *App) DeleteUser(email string) error {
 }
 
 // Takes session token, returns (Session,error)
-func sessionGet_tok(tok string) (*Session, error) {
-	return nil, nil
+func (a *App) sessionGet_tok(tok string) (*Session, error) {
+	var s *Session
+	err := a.DB_u.Where("Tok LIKE ?", fmt.Sprintf("%%%s%%",tok)).Find(s).Error
+	return s, err
 }
 
 // Takes user's email, returns (Session,error)
-func sessionGet_email(email string) (*Session, error) {
-	return nil, nil
+func (a *App) sessionGet_email(email string) (*Session, error) {
+	// First, get User
+	var u *User
+
+	var s *Session
+	err := a.DB_u.Where("")
+	return s, nil
 }
 
-func sessionInvalidate(tok string) error {
+func (a *App) sessionInvalidate(tok string) error {
 	return nil
 }
 
-func sessionIsValid(tok string) error {
+func (a *App) sessionIsValid(tok string) error {
 	return nil
 }
 
-func newSession(email string, hash []byte) error {
-	/*
-		if hash matches user{
-			u_db.Create(&Session{})
-		}else{
-			return errors.New("invalid credentials")
-		}
-	*/
+func (a *App) newSession(email string, hash []byte) error {
+	var users []User
+	var err error
+	users, err = a.ListUsers_email(email)
+	if err != nil {
+		return err
+	}
+	if len(users) == 0 {
+		return errors.New("couldn't find user")
+	}
+	if len(users) > 1 {
+		return errors.New("multiple results")
+	}
+
+	if bytes.Compare(users[0].Password, hash) == 0 {
+		a.DB_u.Create(&Session{U: user, Tok: uuid.UUID.String(uuid.New()), Valid: true})
+	} else {
+		return errors.New("invalid credentials")
+	}
 	return nil
 }
