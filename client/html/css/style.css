@@ -117,7 +117,7 @@ h2{
     text-align: center;
     padding: 14px;
     text-decoration: none;
-    font-size: 17px;
+    font-size: 30px;
 }
 
 /* Change the color of links on hover */
@@ -169,12 +169,16 @@ h2{
 /******** FLOATING BUTTON ********/
 .triggerButton { display: none; }
 
+.triggerButton:hover + label{
+    background-color: var(--brand-hover);
+}
+
 .triggerButton + label {
     cursor: pointer;
     position: absolute;
-    right: 1em;
-    bottom: 1em;
-    background-color: tomato;
+    right: 2em;
+    bottom: 5em;
+    background-color: var(--brand-normal);
     height: var(--l);
     width: var(--l);
     border-radius: 50%;
