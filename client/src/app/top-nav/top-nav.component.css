@@ -1,5 +1,5 @@
 .topnav {
-    background-color: var(--dark-gray-5);
+    background-color: var(--gray-5);
     overflow: hidden;
     position: fixed;
     top: 0;
@@ -9,7 +9,7 @@
 .topnav a {
     float: right;
     display: block;
-    color: var(--dark-gray-1);
+    color: var(--gray-1);
     text-align: center;
     padding: 14px;
     text-decoration: none;

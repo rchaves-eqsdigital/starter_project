@@ -9,6 +9,7 @@ import { BottomNavComponent } from './bottom-nav/bottom-nav.component';
 import { TopNavComponent } from './top-nav/top-nav.component';
 import { AppRoutingModule } from './app-routing.module';
 import { FloatButtonComponent } from './float-button/float-button.component';
+import { ItemListComponent } from './item-list/item-list.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { FloatButtonComponent } from './float-button/float-button.component';
     SensorsComponent,
     BottomNavComponent,
     TopNavComponent,
-    FloatButtonComponent
+    FloatButtonComponent,
+    ItemListComponent
   ],
   imports: [
     BrowserModule,

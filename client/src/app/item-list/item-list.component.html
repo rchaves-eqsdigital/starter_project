@@ -1,0 +1,9 @@
+<ul class="items">
+    <li *ngFor="let item of items">
+        <img *ngIf="item.getPic().length != 0; else emptyPic" [src]="item.getPic()"/>
+        <ng-template #emptyPic>
+            <i class="fa fa-user"></i>
+        </ng-template>
+        <span>{{item.getTitle()}}</span>
+    </li>
+</ul>
