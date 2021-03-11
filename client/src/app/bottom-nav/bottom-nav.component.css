@@ -1,5 +1,5 @@
 .nav {
-    background-color: var(--dark-gray-5);
+    background-color: var(--gray-5);
     overflow: hidden;
     position: fixed;
     bottom: 0;
@@ -9,7 +9,7 @@
 .nav a {
     float: left;
     display: block;
-    color: var(--dark-gray-1);
+    color: var(--gray-1);
     text-align: center;
     padding: 14px;
     text-decoration: none;
@@ -17,13 +17,13 @@
 }
 
 .nav a:hover {
-    background-color: var(--dark-gray-6);
-    color: var(--dark-gray-2);
+    background-color: var(--gray-6);
+    color: var(--gray-2);
 }
 
 .nav a.active {
-    background-color: var(--dark-gray-6);
-    color: var(--dark-gray-1);
+    background-color: var(--gray-6);
+    color: var(--gray-1);
 }
 
 .nav .icon {

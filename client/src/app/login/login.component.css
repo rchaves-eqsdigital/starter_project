@@ -1,19 +1,19 @@
 .box{
-    background: var(--dark-gray-1);
+    background: var(--gray-1);
     width:300px;
     border-radius:6px;
     margin: 0 auto 0 auto;
     padding:0px 0px 70px 0px;
-    border: var(--dark-gray-2) 4px solid; 
+    border: var(--gray-2) 4px solid; 
 }
 
 .email{
-    background: var(--dark-gray-1);
-    border: var(--dark-gray-2) 1px solid;
-    border-bottom: var(--dark-gray-2) 2px solid;
+    background: var(--gray-1);
+    border: var(--gray-2) 1px solid;
+    border-bottom: var(--gray-2) 2px solid;
     padding: 8px;
     width:250px;
-    color: var(--dark-gray-2);
+    color: var(--gray-2);
     margin-top:10px;
     font-size:1em;
     border-radius:4px;
@@ -24,7 +24,7 @@
     width:125px;
     padding-top:5px;
     padding-bottom:5px;
-    color:var(--dark-gray-1);
+    color:var(--gray-1);
     border-radius:4px;
     border: var(--brand-hover) 1px solid;
 
@@ -42,12 +42,12 @@
 
 #btn2{
     float:left;
-    background:var(--dark-gray-5);
+    background:var(--gray-5);
     width:125px;  padding-top:5px;
     padding-bottom:5px;
-    color:var(--dark-gray-1);
+    color:var(--gray-1);
     border-radius:4px;
-    border: var(--dark-gray-3) 1px solid;
+    border: var(--gray-3) 1px solid;
 
     margin-top:20px;
     margin-bottom:20px;
@@ -57,5 +57,5 @@
 }
 
 #btn2:hover{ 
-    background:var(--dark-gray-3); 
+    background:var(--gray-3); 
 }
