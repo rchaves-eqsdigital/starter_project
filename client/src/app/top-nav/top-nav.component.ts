@@ -7,9 +7,29 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TopNavComponent implements OnInit {
 
+  private toggled: boolean = false;
+
   constructor() { }
 
-  ngOnInit(): void {
+  ngOnInit(): void { }
+
+  public switchLights(): void {
+    if (this.toggled) {
+      this.setLight();
+    } else {
+      this.setDark();
+    }
+    this.toggled = !this.toggled;
+  }
+
+  private setLight(): void {
+    document.body.classList.toggle('dark',false);
+    document.body.classList.toggle('light',true);
+  }
+
+  private setDark(): void {
+    document.body.classList.toggle('light',false);
+    document.body.classList.toggle('dark',true);
   }
 
 }
