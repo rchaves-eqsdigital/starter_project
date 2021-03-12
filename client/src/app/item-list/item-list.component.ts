@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Item } from './item';
 
 @Component({
@@ -9,15 +10,17 @@ import { Item } from './item';
 export class ItemListComponent implements OnInit {
 
   @Input()
-  items: Item[] = []
+  items: Item[] = [];
 
   @Input()
-  child: String = ''; // next component when clicked
+  defaultIcon: String;
 
-  constructor() { }
+  href: String;
+
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
-    
+    this.href = this.router.url;
   }
 
 }

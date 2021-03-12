@@ -1,9 +1,13 @@
 <ul class="items">
-    <li *ngFor="let item of items">
-        <img *ngIf="item.getPic().length != 0; else emptyPic" [src]="item.getPic()"/>
-        <ng-template #emptyPic>
-            <i class="fa fa-user"></i>
-        </ng-template>
-        <span>{{item.getTitle()}}</span>
-    </li>
+    <ng-container *ngFor="let item of items">
+    <a href="{{this.href}}/{{item.getID()}}">
+        <li>
+            <img *ngIf="item.getPic().length != 0; else emptyPic" [src]="item.getPic()"/>
+            <ng-template #emptyPic>
+                <i class="fa {{this.defaultIcon}}"></i>
+            </ng-template>
+            <span>{{item.getTitle()}}</span>
+        </li>
+    </a>
+    </ng-container>
 </ul>
