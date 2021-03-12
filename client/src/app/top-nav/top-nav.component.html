@@ -1,4 +1,5 @@
 <div class="topnav">
+    <a *ngIf="back" href="{{back}}"><</a>
     <span>Dark Mode:</span>
     <label class="switch">
         <input type="checkbox" id="darkModeSwitch" (click)="switchLights()">
