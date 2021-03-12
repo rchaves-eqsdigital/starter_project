@@ -11,6 +11,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { FloatButtonComponent } from './float-button/float-button.component';
 import { ItemListComponent } from './item-list/item-list.component';
 import { ItemDetailsComponent } from './item-details/item-details.component';
+import { GraphComponent } from './graph/graph.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { ItemDetailsComponent } from './item-details/item-details.component';
     TopNavComponent,
     FloatButtonComponent,
     ItemListComponent,
-    ItemDetailsComponent
+    ItemDetailsComponent,
+    GraphComponent
   ],
   imports: [
     BrowserModule,
