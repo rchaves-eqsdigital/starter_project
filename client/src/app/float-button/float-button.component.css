@@ -6,7 +6,7 @@
 
 .triggerButton + label {
     cursor: pointer;
-    position: absolute;
+    position: fixed;
     right: 2em;
     bottom: 5em;
     background-color: var(--brand-normal);
