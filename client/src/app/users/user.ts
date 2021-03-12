@@ -17,7 +17,7 @@ export class User implements Item {
      * getPic
      */
     public getPic(): String {
-        return this.Pic;
+        return this.Pic === null ? "" : this.Pic;
     }
 
     /**

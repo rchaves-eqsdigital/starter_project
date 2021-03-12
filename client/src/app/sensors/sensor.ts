@@ -13,7 +13,7 @@ export class Sensor implements Item {
      * getPic
      */
     public getPic(): String {
-        return this.Pic;
+        return this.Pic === null ? "" : this.Pic;
     }
 
     /**
@@ -28,13 +28,20 @@ export class Sensor implements Item {
      * getTitle
      */
     public getTitle(): String {
-        return this.getName()
+        return this.getName();
     }
 
     /**
      * getTitle
      */
     public getBody(): String {
-        return "regular sensor"
+        return "regular sensor";
+    }
+
+    /**
+     * getID
+     */
+    public getID(): String {
+        return this.getName();
     }
 }
