@@ -10,6 +10,7 @@ import { TopNavComponent } from './top-nav/top-nav.component';
 import { AppRoutingModule } from './app-routing.module';
 import { FloatButtonComponent } from './float-button/float-button.component';
 import { ItemListComponent } from './item-list/item-list.component';
+import { ItemDetailsComponent } from './item-details/item-details.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { ItemListComponent } from './item-list/item-list.component';
     BottomNavComponent,
     TopNavComponent,
     FloatButtonComponent,
-    ItemListComponent
+    ItemListComponent,
+    ItemDetailsComponent
   ],
   imports: [
     BrowserModule,
