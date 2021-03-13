@@ -110,7 +110,8 @@ export class GraphComponent implements OnInit {
 
   private canvasInit(id: string): void {
     let canvas = document.getElementById(id) as HTMLCanvasElement;
-    let ctx = canvas.getContext("2d");
+    let ctx = this.setupCanvas(canvas);
+    ctx.lineWidth = 2;
 
     function m(a,b) {
       return Math.max(a,b);
@@ -171,6 +172,22 @@ export class GraphComponent implements OnInit {
     
     //ctx.beginPath();
     ctx.moveTo(this.pos_r.x,this.pos_r.y);
+  }
+
+  private setupCanvas(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+    // Get the device pixel ratio, falling back to 1.
+    var dpr = window.devicePixelRatio || 1;
+    // Get the size of the canvas in CSS pixels.
+    var rect = canvas.getBoundingClientRect();
+    // Give the canvas pixel dimensions of their CSS
+    // size * the device pixel ratio.
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    var ctx = canvas.getContext('2d');
+    // Scale all drawing operations by the dpr, so you
+    // don't have to worry about the difference.
+    ctx.scale(dpr, dpr);
+    return ctx;
   }
 
 
