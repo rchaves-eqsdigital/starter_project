@@ -1,8 +1,8 @@
 <h3>Apache ECharts</h3>
-<div id="g_echart" style="width:100%; height:300px;"></div>
+<app-line-echarts [data]="data"></app-line-echarts>
+
 <h3>Chart.js</h3>
-<div id="g_chart" style="width:100%; height:300px;">
-    <canvas #canvas></canvas>
-</div>
+<app-line-chartjs [data]="data"></app-line-chartjs>
+
 <h3>Canvas</h3>
-<canvas id="g_canvas" style="width:100%; height:300px;"></canvas>
+<app-line-canvas [data]="data"></app-line-canvas>

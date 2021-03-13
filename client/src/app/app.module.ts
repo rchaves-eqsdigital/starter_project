@@ -12,6 +12,9 @@ import { FloatButtonComponent } from './float-button/float-button.component';
 import { ItemListComponent } from './item-list/item-list.component';
 import { ItemDetailsComponent } from './item-details/item-details.component';
 import { GraphComponent } from './graph/graph.component';
+import { LineEchartsComponent } from './line-echarts/line-echarts.component';
+import { LineChartjsComponent } from './line-chartjs/line-chartjs.component';
+import { LineCanvasComponent } from './line-canvas/line-canvas.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +27,10 @@ import { GraphComponent } from './graph/graph.component';
     FloatButtonComponent,
     ItemListComponent,
     ItemDetailsComponent,
-    GraphComponent
+    GraphComponent,
+    LineEchartsComponent,
+    LineChartjsComponent,
+    LineCanvasComponent
   ],
   imports: [
     BrowserModule,
