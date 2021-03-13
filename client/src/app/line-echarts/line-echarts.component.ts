@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { init, use } from 'echarts/core';
 import { LineChart } from 'echarts/charts';
 import { GridComponent } from 'echarts/components';
@@ -14,15 +14,18 @@ export class LineEchartsComponent implements OnInit {
   @Input()
   data: {x:number[],y:number[]};
 
+  @ViewChild('echart', {static: true})
+  private canvas: ElementRef;
+
   constructor() { }
 
   ngOnInit(): void {
-    this.echartInit('g_echart');
+    this.echartInit();
   }
 
-  private echartInit(id: string): void {
+  private echartInit(): void {
     use([LineChart, GridComponent, CanvasRenderer]);
-    var myChart = init(document.getElementById(id));
+    var myChart = init(this.canvas.nativeElement);
     var option = {
       tooltip: {},
       xAxis: {

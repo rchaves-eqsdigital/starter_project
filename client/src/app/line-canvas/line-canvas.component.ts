@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-line-canvas',
@@ -10,14 +10,20 @@ export class LineCanvasComponent implements OnInit {
   @Input()
   data: {x:number[],y:number[]};
 
+  @ViewChild('canvas', {static: true})
+  private canvas: ElementRef;
+
+  private pos: {x:number,y:number} = {x:0,y:0}; // "normal" coordinates, (0,0) at bottom left, y' positive up, x' positive right
+  private pos_r: {x:number,y:number} = {x:0,y:0}; // real pos
+
   constructor() { }
 
   ngOnInit(): void {
-    this.canvasInit('g_canvas');
+    this.canvasInit();
   }
 
-  private canvasInit(id: string): void {
-    let canvas = document.getElementById(id) as HTMLCanvasElement;
+  private canvasInit(): void {
+    let canvas = this.canvas.nativeElement;
     let ctx = this.setupCanvas(canvas);
     ctx.lineWidth = 2;
 
@@ -47,9 +53,6 @@ export class LineCanvasComponent implements OnInit {
     }
     ctx.stroke();
   }
-
-  private pos: {x:number,y:number} = {x:0,y:0};
-  private pos_r: {x:number,y:number} = {x:0,y:0}; // real pos
 
   private c_init(ctx: CanvasRenderingContext2D, c_x: number, c_y: number, x_off: number=0, y_off: number=0): void {
     this.pos.x = 0;

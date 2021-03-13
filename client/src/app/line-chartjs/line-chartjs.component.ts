@@ -9,11 +9,10 @@ import * as chart from 'chart.js';
 export class LineChartjsComponent implements OnInit {
 
   @ViewChild('canvas', {static: true})
-	public canvas: ElementRef;
-  //public data: {x: any, y: any}[] = null;
+  public canvas: ElementRef;
   public context: CanvasRenderingContext2D = null;
-	public chart: chart.Chart = null;
-	public dataset: chart.ChartData = null;
+  public chart: chart.Chart = null;
+  public dataset: chart.ChartData = null;
 
   @Input()
   data: {x:number[],y:number[]};
@@ -21,10 +20,10 @@ export class LineChartjsComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this.chartjsInit('g_chart');
+    this.chartjsInit();
   }
 
-  private chartjsInit(id: string): void {
+  private chartjsInit(): void {
     this.dataset = {
 			labels: [],
 			datasets: [{
