@@ -73,14 +73,14 @@ export class LineCanvasComponent implements OnInit {
     ctx.lineWidth = 1;
     ctx.strokeStyle="rgba(0,0,0,0.3)";
     ctx.beginPath();
-    let h_s = 62;
+    let h_s = 62; // TODO: I think this is not accurate for every canvas size
     // Vertical lines
     for (let i = 0; (this.pos_r.x+(i*h_s))<canvas_w; i++) {
       ctx.moveTo(this.pos_r.x+(i*h_s), this.pos_r.y);
       ctx.lineTo(this.pos_r.x+(i*h_s),0);
     }
     // Horizontal lines
-    let v_s = 37;
+    let v_s = 37; // TODO: I think this is not accurate for every canvas size
     for (let i = 0; i<20; i++) {
       ctx.moveTo(0,this.pos_r.y-(i*v_s));
       ctx.lineTo(canvas_w,this.pos_r.y-(i*v_s));

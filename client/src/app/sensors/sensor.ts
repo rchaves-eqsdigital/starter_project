@@ -3,10 +3,12 @@ import { Item } from '../item-list/item';
 export class Sensor implements Item {
     private Pic: String; // Base64 Encoded
     private Name: String;
+    private Body: String;
 
-    constructor(pic: String, name: String) {
+    constructor(pic: String, name: String, body: String="regular sensor") {
         this.Pic = pic;
         this.Name = name;
+        this.Body = body;
     }
 
     /**
@@ -35,7 +37,7 @@ export class Sensor implements Item {
      * getTitle
      */
     public getBody(): String {
-        return "regular sensor";
+        return this.Body;
     }
 
     /**

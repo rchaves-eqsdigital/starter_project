@@ -15,6 +15,7 @@ import { GraphComponent } from './graph/graph.component';
 import { LineEchartsComponent } from './line-echarts/line-echarts.component';
 import { LineChartjsComponent } from './line-chartjs/line-chartjs.component';
 import { LineCanvasComponent } from './line-canvas/line-canvas.component';
+import { ItemFormComponent } from './item-form/item-form.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { LineCanvasComponent } from './line-canvas/line-canvas.component';
     GraphComponent,
     LineEchartsComponent,
     LineChartjsComponent,
-    LineCanvasComponent
+    LineCanvasComponent,
+    ItemFormComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,16 @@
+<button id="btn">EDIT</button>
+
+<div id="myModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+        <span id="close" class="close">&times;</span>
+        <h3>{{item.getTitle()}}</h3>
+        <p>{{item.getBody()}}</p>
+        <form>
+            <label for="body">Field 1:</label><input id="textbox" type="text" value="{{item.getBody()}}">
+            <input id="btn" type="button" value="Save" (click)="formClick()">
+        </form>
+    </div>
+
+</div>
