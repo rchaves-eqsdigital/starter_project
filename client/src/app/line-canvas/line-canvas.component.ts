@@ -13,16 +13,18 @@ export class LineCanvasComponent implements OnInit {
   @ViewChild('canvas', {static: true})
   private canvas: ElementRef;
 
-  private pos: {x:number,y:number} = {x:0,y:0}; // "normal" coordinates, (0,0) at bottom left, y' positive up, x' positive right
-  private pos_r: {x:number,y:number} = {x:0,y:0}; // real pos
+  // "normal" coordinates, (0,0) at bottom left, y' positive up, x' positive right
+  private pos: {x:number,y:number} = {x:0,y:0};
+  // real pos
+  private pos_r: {x:number,y:number} = {x:0,y:0};
 
   constructor() { }
 
   ngOnInit(): void {
-    this.canvasInit();
+    this.canvasRun();
   }
 
-  private canvasInit(): void {
+  private canvasRun(): void {
     let canvas = this.canvas.nativeElement;
     let ctx = this.setupCanvas(canvas);
     ctx.lineWidth = 2;
@@ -43,6 +45,7 @@ export class LineCanvasComponent implements OnInit {
     }
 
     this.c_init(ctx,canvas.width,canvas.height);
+    this.drawGrid(ctx,canvas.width,canvas.height);
     for (let i = 0; i < this.data.x.length; i++) {
       let x = this.data.x[i];
       let y = this.data.y[i];
@@ -61,6 +64,34 @@ export class LineCanvasComponent implements OnInit {
     this.pos_r.y = c_y-y_off;
     ctx.beginPath();
     ctx.moveTo(this.pos_r.x, this.pos_r.y);
+  }
+
+  private drawGrid(ctx: CanvasRenderingContext2D, canvas_w: number, canvas_h: number): void {
+    ctx.closePath();
+    ctx.save();
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle="rgba(0,0,0,0.3)";
+    ctx.beginPath();
+    let h_s = 62;
+    // Vertical lines
+    for (let i = 0; (this.pos_r.x+(i*h_s))<canvas_w; i++) {
+      ctx.moveTo(this.pos_r.x+(i*h_s), this.pos_r.y);
+      ctx.lineTo(this.pos_r.x+(i*h_s),0);
+    }
+    // Horizontal lines
+    let v_s = 37;
+    for (let i = 0; i<20; i++) {
+      ctx.moveTo(0,this.pos_r.y-(i*v_s));
+      ctx.lineTo(canvas_w,this.pos_r.y-(i*v_s));
+    }
+    // Reset "pointer"
+    ctx.moveTo(this.pos_r.x, this.pos_r.y);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.restore();
+    ctx.beginPath();
   }
 
   // Draws line on `ctx` starting from the current position
