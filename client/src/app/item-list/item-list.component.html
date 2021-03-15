@@ -1,6 +1,6 @@
 <ul class="items">
     <ng-container *ngFor="let item of items">
-    <a href="{{this.href}}/{{item.getID()}}">
+    <a routerLink="{{this.href}}/{{item.getID()}}">
         <li>
             <img *ngIf="item.getPic().length != 0; else emptyPic" [src]="item.getPic()"/>
             <ng-template #emptyPic>
