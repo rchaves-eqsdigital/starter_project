@@ -1,12 +1,9 @@
 package main
 
 import (
-	"bytes"
-	"errors"
 	"fmt"
 
 	"./errs"
-	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -112,11 +109,13 @@ func (a *App) sessionGet_tok(tok string) (*Session, error) {
 // Takes user's email, returns (Session,error)
 func (a *App) sessionGet_email(email string) (*Session, error) {
 	// First, get User
+	/*
 	var u *User
 
 	var s *Session
 	err := a.DB_u.Where("")
-	return s, nil
+	 */
+	return nil, nil
 }
 
 func (a *App) sessionInvalidate(tok string) error {
@@ -128,6 +127,7 @@ func (a *App) sessionIsValid(tok string) error {
 }
 
 func (a *App) newSession(email string, hash []byte) error {
+	/*
 	var users []User
 	var err error
 	users, err = a.ListUsers_email(email)
@@ -146,5 +146,7 @@ func (a *App) newSession(email string, hash []byte) error {
 	} else {
 		return errors.New("invalid credentials")
 	}
+
+	 */
 	return nil
 }

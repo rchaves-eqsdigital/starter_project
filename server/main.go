@@ -1,10 +1,9 @@
 package main
 
 import (
-	"log"
-
 	"./errs"
 	"gorm.io/gorm"
+	"log"
 )
 
 type App struct {
@@ -26,14 +25,13 @@ func main() {
 	a := App{}
 	err := a.Init()
 	errs.F_err(err)
-	/* err := Init_user_db()
-	errs.F_err(err)
-
-	err = Init_sensor_db()
-	errs.F_err(err) */
 
 	sensors, _ := a.ListSensors()
 	log.Println("Number of sensors:", len(sensors))
+	for i, _ := range sensors {
+		a.ListDataEntries(&sensors[i])
+		log.Println(sensors[i])
+	}
 
 	a.Run()
 }
