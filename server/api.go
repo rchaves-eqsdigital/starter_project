@@ -77,7 +77,7 @@ func apiSensorData(w http.ResponseWriter, r *http.Request, id int) {
 		return
 	}
 	// Get data from DB
-	data, err := a.ListDataEntries(s)
+	data, err := a.ListDataEntries(s) // []DataEntry
 	errs.F_err(err)
 	// Marshall data to JSON
 	ret, _ := json.Marshal(data)

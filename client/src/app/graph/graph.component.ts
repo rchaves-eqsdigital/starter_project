@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { ApiService } from '../api.service';
+import { DataEntry } from '../data-entry';
 
 @Component({
   selector: 'app-graph',
@@ -8,11 +11,19 @@ import { Component, OnInit } from '@angular/core';
 export class GraphComponent implements OnInit {
   
   data: {x:number[],y:number[]} = {x:[],y:[]};
+  data_entries: DataEntry[] = [];
 
-  constructor() { }
+  constructor(private apiService: ApiService, private router: Router) { }
 
   ngOnInit(): void {
+    this.getData();
     this.data.x = [0,1,2,3,4,5];
     this.data.y = [5, 20, 36, 10, 10, 20];
+  }
+
+  getData(): void {
+    console.log(this.router.url);
+    this.apiService.getSensorData("1")
+        .subscribe(data => this.data_entries = data);
   }
 }
