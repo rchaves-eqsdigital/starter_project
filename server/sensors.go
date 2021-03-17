@@ -44,10 +44,11 @@ func (d DataEntry) String() string {
 /////////////////////////////////////////////////
 
 // Required before using the DB
-func (a *App) Init_sensor_db() error {
+func (a *App) InitSensorDB() error {
 	var err error
 	a.DB_s, err = gorm.Open(sqlite.Open("db/sensors.db"), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Error),
+		//Logger: logger.Default.LogMode(logger.Error),
+		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	errs.F_err(err)
 
@@ -73,7 +74,7 @@ func (a *App) Init_sensor_db() error {
 // CSV format: id,room_id/id,noted_date,temp,out/in
 // Date format:08-12-2018 09:29
 func (a *App) loadDataset() {
-	start_t := time.Now()
+	startTime := time.Now()
 	fname := "db/IOT-temp.csv"
 	file, err := os.Open(fname)
 	errs.F_err(err)
@@ -147,8 +148,8 @@ func (a *App) loadDataset() {
 	}
 	close(done)
 
-	elapsed_t := time.Since(start_t)
-	log.Printf("Finished loading dataset: %s", elapsed_t)
+	elapsedTime := time.Since(startTime)
+	log.Printf("Finished loading dataset: %s", elapsedTime)
 }
 
 func workerThread(a *App, w int, jobs <-chan []DataEntry, done chan<- int) {
@@ -234,8 +235,9 @@ func (a *App) ListDataEntries(s *Sensor) ([]DataEntry, error) {
 	return s.data, nil
 }
 
-func (a *App) DeleteSensor(id string) error {
+func (a *App) DeleteSensor(id int) error {
 	var sensor Sensor
+	sensor.ID = uint(id)
 	err := a.DB_s.First(&sensor, 1).Error
 	if err != nil {
 		log.Fatalln("couldn't find sensor with ID", id)
@@ -250,6 +252,15 @@ func (a *App) DeleteSensor(id string) error {
 
 func (a *App) UpdateSensor() error {
 	return nil
+}
+
+func (a *App) ExistsSensor(id int) (bool, *Sensor) {
+	sensor := &Sensor{}
+	err := a.DB_s.First(sensor, id).Error
+	if err != nil {
+		return false, nil
+	}
+	return true, sensor
 }
 
 func GetData() {
