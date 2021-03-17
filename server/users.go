@@ -61,7 +61,7 @@ func (a *App) Logout(email string) error {
 //////////////////// DB /////////////////////////
 /////////////////////////////////////////////////
 
-func (a *App) Init_user_db() error {
+func (a *App) InitUserDB() error {
 	var err error
 	a.DB_u, err = gorm.Open(sqlite.Open("db/users.db"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
