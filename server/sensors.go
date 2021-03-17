@@ -79,7 +79,15 @@ func (a *App) loadDataset() {
 	errs.F_err(err)
 	defer file.Close()
 
-	log.Println("Loading dataset")
+	const buffer_max_size = 1024
+	const workers = 4
+	lines := make([]DataEntry, buffer_max_size)
+	log.Printf("Loading dataset using %d bytes buffers and %d workers.",buffer_max_size,workers)
+	jobs := make(chan []DataEntry)
+	done := make(chan int)
+	for w := 1; w <= workers; w++{
+		go workerThread(a,w,jobs,done)
+	}
 
 	scanner := bufio.NewScanner(file)
 	scanner.Scan() // Skip first CSV line
@@ -92,6 +100,7 @@ func (a *App) loadDataset() {
 			case 0:
 			case 1:
 				// New Sensor
+				// Assumes that data entries of different sensors aren't mixed.
 				if v != s.RoomID {
 					s = Sensor{RoomID: v}
 					a.CreateSensor(&s)
@@ -113,18 +122,42 @@ func (a *App) loadDataset() {
 				d.InOut = v
 				d.SensorID = s.ID;
 				// Last field, DataEntry ready.
-				a.CreateDataEntry(&d)
+				lines = append(lines,d)
+				if len(lines) == cap(lines) {
+					// Flush data entries to workers
+					jobs <- lines
+					lines = make([]DataEntry, 0, buffer_max_size) // clear list
+				}
 				d = DataEntry{}
 			default:
 				errs.F_err(errors.New("shouldn't be here!"))
 			}
 		}
 	}
-	log.Println(s)
-	//a.CreateSensor(&s) // Write last sensor
+	// Signal workers to end
+	close(jobs)
+	// Last batch if there is leftover data
+	if len(lines) > 0 {
+		a.CreateDataEntryBatch(&lines)
+	}
+	// Wait for workers to end (join)
+	for workers_done := 0; workers_done < workers; {
+		<-done // Blocking
+		workers_done += 1
+	}
+	close(done)
 
 	elapsed_t := time.Since(start_t)
 	log.Printf("Finished loading dataset: %s", elapsed_t)
+}
+
+func workerThread(a *App, w int, jobs <-chan []DataEntry, done chan<- int) {
+	for v := range jobs {
+		tmp := make([]DataEntry, len(v))
+		copy(tmp, v)
+		a.CreateDataEntryBatch(&tmp)
+	}
+	done <- w
 }
 
 // Creates a sensor in the DB from existing struct
