@@ -11,6 +11,8 @@ export class ApiService {
 
   private apiURL = "localhost:8080/api/v0/";
 
+  // TODO: WIP
+
   constructor(private http: HttpClient) { }
 
   getSensorData(id: string): Observable<DataEntry[]> {
