@@ -1,5 +1,5 @@
-import { Component, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
-import { init, use } from 'echarts/core';
+import { Component, Input, ViewChild, ElementRef, OnInit, OnChanges } from '@angular/core';
+import { EChartsType, init, use } from 'echarts/core';
 import { LineChart } from 'echarts/charts';
 import { GridComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
@@ -9,7 +9,7 @@ import { CanvasRenderer } from 'echarts/renderers';
   templateUrl: './line-echarts.component.html',
   styleUrls: ['./line-echarts.component.css']
 })
-export class LineEchartsComponent implements OnInit {
+export class LineEchartsComponent implements OnInit, OnChanges {
 
   @Input()
   data: {x:number[],y:number[]};
@@ -17,16 +17,29 @@ export class LineEchartsComponent implements OnInit {
   @ViewChild('echart', {static: true})
   private canvas: ElementRef;
 
+  private chart: EChartsType = null;
+
   constructor() { }
 
   ngOnInit(): void {
-    this.echartInit();
+    if (this.chart === null) {
+      this.echartInit();
+    }
+  }
+
+  ngOnChanges(): void {
+    this.update();
   }
 
   private echartInit(): void {
     use([LineChart, GridComponent, CanvasRenderer]);
-    var myChart = init(this.canvas.nativeElement);
-    var option = {
+    this.chart = init(this.canvas.nativeElement);
+    this.update();
+  }
+
+  private update(): void {
+    this.ngOnInit(); // Initialize if needed
+    let option = {
       tooltip: {},
       xAxis: {
           data: this.data.x
@@ -39,10 +52,11 @@ export class LineEchartsComponent implements OnInit {
     };
 
     // use configuration item and data specified to show chart
-    myChart.setOption(option);
+    this.chart.setOption(option);
 
+    let chart = this.chart;
     window.addEventListener('resize',function(){
-      myChart.resize();
+      chart.resize();
     })
   }
 

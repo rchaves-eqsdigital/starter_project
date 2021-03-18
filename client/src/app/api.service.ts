@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { DataEntry } from './data-entry';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class ApiService {
 
   getSensorData(id: string): Observable<DataEntry[]> {
     let url: string = this.apiURL+`sensor/${id}/data`;
-    console.log(url);
+    if (!environment.production) { console.log(url); }
     return this.http.get<DataEntry[]>(url)
       .pipe(
         tap(_ => console.log('fetched sensor data')),

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 import { ApiService } from '../api.service';
 import { DataEntry } from '../data-entry';
 
@@ -10,21 +11,33 @@ import { DataEntry } from '../data-entry';
 })
 export class GraphComponent implements OnInit {
   
-  data: {x:number[],y:number[]} = {x:[],y:[]};
-  data_entries: DataEntry[] = [];
+  data: {x:any[],y:number[]} = {x:[],y:[]};
 
   constructor(private apiService: ApiService, private router: Router) { }
 
   ngOnInit(): void {
-    console.log(this.router.url);
-    this.getData();
     this.data.x = [0,1,2,3,4,5];
     this.data.y = [5, 20, 36, 10, 10, 20];
+    this.getData();
   }
 
   getData(): void {
     //console.log(this.router.url);
     this.apiService.getSensorData("3")
-        .subscribe((data) => {this.data_entries = data; console.log(data); console.log(data[0].Temp)});
+        .subscribe((data) => {
+          if (!environment.production) { console.log("Got data with len "+data.length); }
+          this.data = this.parseDataEntries(data);
+        });
+  }
+
+  private parseDataEntries(x: DataEntry[]): {x:any[],y:number[]} {
+    let ret: {x:any[],y:number[]} = {x:[],y:[]};
+    for (let i = 0; i < x.length; i++) {
+      const e = x[i];
+      ret.x.push(e.Date);
+      ret.y.push(e.Temp);
+    }
+    if (!environment.production) { console.log("[parseDataEntries] x["+ret.x.length+"] y["+ret.y.length+"]"); }
+    return ret
   }
 }

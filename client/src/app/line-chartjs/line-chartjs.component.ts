@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, OnInit, OnChanges } from '@angular/core';
 import * as chart from 'chart.js';
 
 @Component({
@@ -6,10 +6,11 @@ import * as chart from 'chart.js';
   templateUrl: './line-chartjs.component.html',
   styleUrls: ['./line-chartjs.component.css']
 })
-export class LineChartjsComponent implements OnInit {
+export class LineChartjsComponent implements OnInit, OnChanges {
 
   @ViewChild('canvas', {static: true})
   public canvas: ElementRef;
+
   public context: CanvasRenderingContext2D = null;
   public chart: chart.Chart = null;
   public dataset: chart.ChartData = null;
@@ -20,26 +21,26 @@ export class LineChartjsComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this.chartjsInit();
+    if (this.context === null || this.chart === null || this.dataset === null) {
+      this.chartjsInit();
+    }
+  }
+
+  ngOnChanges(): void {
+    this.chartjsUpdate();
   }
 
   private chartjsInit(): void {
+    const color: string = '#f00';
     this.dataset = {
 			labels: [],
 			datasets: [{
-				data: [],
-				backgroundColor: '',
-				borderColor: '',
+				data: this.rollUp(this.data.x,this.data.y),
+				backgroundColor: color + '33',
+				borderColor: color,
 				fill: 'origin'
 			}]
 		};
-
-    const color: string = '#f00';
-
-    this.dataset.datasets[0].data = this.rollUp(this.data.x,this.data.y);
-    this.dataset.datasets[0].backgroundColor = color + '33';
-    this.dataset.datasets[0].borderColor = color;
-
     this.context = this.canvas.nativeElement.getContext('2d');
     chart.Chart.register(chart.LineController, chart.LineElement, chart.PointElement, chart.LinearScale, chart.Title);
     this.chart = new chart.Chart(this.context, {
@@ -69,6 +70,12 @@ export class LineChartjsComponent implements OnInit {
 				interaction: {mode: 'nearest'}
 			}
 		});
+  }
+
+  private chartjsUpdate(): void {
+    this.ngOnInit(); // Initialize if needed
+    this.dataset.datasets[0].data = this.rollUp(this.data.x,this.data.y);
+    this.chart.update();
   }
 
   private rollUp(x_arr: number[], y_arr: number[]): {x: any, y: any}[] {
