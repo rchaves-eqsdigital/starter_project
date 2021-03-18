@@ -16,6 +16,7 @@ import { LineEchartsComponent } from './line-echarts/line-echarts.component';
 import { LineChartjsComponent } from './line-chartjs/line-chartjs.component';
 import { LineCanvasComponent } from './line-canvas/line-canvas.component';
 import { ItemFormComponent } from './item-form/item-form.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { ItemFormComponent } from './item-form/item-form.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

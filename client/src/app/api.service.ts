@@ -9,9 +9,7 @@ import { catchError, tap } from 'rxjs/operators';
 })
 export class ApiService {
 
-  private apiURL = "localhost:8080/api/v0/";
-
-  // TODO: WIP
+  private apiURL = "http://localhost:8080/api/v0/";
 
   constructor(private http: HttpClient) { }
 
