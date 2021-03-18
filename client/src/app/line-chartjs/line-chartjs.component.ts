@@ -1,5 +1,7 @@
 import { Component, Input, ViewChild, ElementRef, OnInit, OnChanges } from '@angular/core';
 import * as chart from 'chart.js';
+import { environment } from 'src/environments/environment';
+import { Logging } from '../logging';
 
 @Component({
   selector: 'app-line-chartjs',
@@ -21,7 +23,7 @@ export class LineChartjsComponent implements OnInit, OnChanges {
   constructor() { }
 
   ngOnInit(): void {
-    if (this.context === null || this.chart === null || this.dataset === null) {
+    if (this.context === null && this.chart === null && this.dataset === null) {
       this.chartjsInit();
     }
   }
@@ -42,7 +44,7 @@ export class LineChartjsComponent implements OnInit, OnChanges {
 			}]
 		};
     this.context = this.canvas.nativeElement.getContext('2d');
-    chart.Chart.register(chart.LineController, chart.LineElement, chart.PointElement, chart.LinearScale, chart.Title);
+    chart.Chart.register(chart.LineController, chart.LineElement, chart.PointElement, chart.LinearScale, chart.TimeScale, chart.Title);
     this.chart = new chart.Chart(this.context, {
 			type: 'line',
 			data: this.dataset,
@@ -81,7 +83,9 @@ export class LineChartjsComponent implements OnInit, OnChanges {
   private rollUp(x_arr: number[], y_arr: number[]): {x: any, y: any}[] {
     let ret = [];
     if (x_arr.length != y_arr.length) {
-      console.log("x:"+x_arr+", y:"+y_arr);
+      if (!environment.production) {
+        Logging.log("x:"+x_arr+", y:"+y_arr);
+      }
       return null;
     }
     for (let i = 0; i < x_arr.length; i++) {

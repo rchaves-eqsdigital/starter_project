@@ -4,6 +4,7 @@ import { DataEntry } from './data-entry';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { Logging } from './logging';
 
 @Injectable({
   providedIn: 'root'
@@ -16,18 +17,18 @@ export class ApiService {
 
   getSensorData(id: string): Observable<DataEntry[]> {
     let url: string = this.apiURL+`sensor/${id}/data`;
-    if (!environment.production) { console.log(url); }
+    if (!environment.production) { Logging.log(url); }
     return this.http.get<DataEntry[]>(url)
       .pipe(
-        tap(_ => console.log('fetched sensor data')),
+        tap(_ => Logging.log('fetched sensor data')),
         catchError(this.handleError<DataEntry[]>('getSensorData',[]))
       );
   }
 
-  private handleError<T>(operation='operation',result?: T){
+  private handleError<T>(operation='operation',result?: T) {
     return (error: any): Observable<T> => {
-      console.log(error); // log to console
-      console.log(`${operation} failed: ${error.message}`);
+      Logging.log(error); // log to console
+      Logging.log(`${operation} failed: ${error.message}`);
       return of(result as T);
     }
   }

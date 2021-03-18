@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { ApiService } from '../api.service';
 import { DataEntry } from '../data-entry';
+import { Logging } from '../logging';
 
 @Component({
   selector: 'app-graph',
@@ -22,10 +23,10 @@ export class GraphComponent implements OnInit {
   }
 
   getData(): void {
-    //console.log(this.router.url);
+    if (!environment.production) { Logging.log(this.router.url); }
     this.apiService.getSensorData("3")
         .subscribe((data) => {
-          if (!environment.production) { console.log("Got data with len "+data.length); }
+          if (!environment.production) { Logging.log("Got data with len "+data.length); }
           this.data = this.parseDataEntries(data);
         });
   }
@@ -37,7 +38,7 @@ export class GraphComponent implements OnInit {
       ret.x.push(e.Date);
       ret.y.push(e.Temp);
     }
-    if (!environment.production) { console.log("[parseDataEntries] x["+ret.x.length+"] y["+ret.y.length+"]"); }
+    if (!environment.production) { Logging.log("x["+ret.x.length+"] y["+ret.y.length+"]"); }
     return ret
   }
 }
