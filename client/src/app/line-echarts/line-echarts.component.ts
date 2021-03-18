@@ -53,11 +53,6 @@ export class LineEchartsComponent implements OnInit, OnChanges {
 
     // use configuration item and data specified to show chart
     this.chart.setOption(option);
-
-    let chart = this.chart;
-    window.addEventListener('resize',function(){
-      chart.resize();
-    })
   }
 
 }
