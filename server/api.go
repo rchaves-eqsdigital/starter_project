@@ -79,10 +79,7 @@ func apiSensorData(w http.ResponseWriter, r *http.Request, id int) {
 	// Get data from DB
 	data, err := a.ListDataEntries(s) // []DataEntry
 	errs.F_err(err)
-	// Marshall data to JSON
-	ret, _ := json.Marshal(data)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(ret)
+	sendAsJson(w, data)
 }
 
 // apiSensorDataAdd is the handler for `/api/v0/sensor/([0-9]+)/data/add`.
@@ -113,6 +110,16 @@ func apiUserData(w http.ResponseWriter, r *http.Request, id int) {
 // Add user.
 func apiUserAdd(w http.ResponseWriter, r *http.Request, id int) {
 
+}
+
+// sendAsJson takes a val of any type, converts it to JSON and writes it to
+// the http.ResponseWriter with the correct headers.
+func sendAsJson(w http.ResponseWriter, val interface{}) {
+	// Marshall data to JSON
+	ret, _ := json.Marshal(val)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+	w.Write(ret)
 }
 
 // match reports whether path matches regex ^pattern$, and if it matches,
