@@ -25,11 +25,11 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 
 	p := r.URL.Path
 	switch {
-	case match(p, "/api/v0/login/"):
+	case match(p, "/api/v0/login"):
 		handler = apiLogin
-	case match(p, "/api/v0/logout/"):
+	case match(p, "/api/v0/logout"):
 		handler = apiLogout
-	case match(p, "/api/v0/sensor/"):
+	case match(p, "/api/v0/sensor"):
 		handler = apiSensor
 	case match(p, "/api/v0/sensor/([0-9]+)/data", &id):
 		handler = apiSensorData
@@ -37,9 +37,9 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 		handler = apiSensorDataAdd
 	case match(p, "/api/v0/sensor/add"):
 		handler = apiSensorAdd
-	case match(p, "/api/v0/user/"):
+	case match(p, "/api/v0/user"):
 		handler = apiUser
-	case match(p, "/api/v0/user/([0-9]+)/data/", &id):
+	case match(p, "/api/v0/user/([0-9]+)/data", &id):
 		handler = apiUserData
 	case match(p, "/api/v0/user/add"):
 		handler = apiUserAdd
@@ -63,7 +63,10 @@ func apiLogout(w http.ResponseWriter, r *http.Request, id int) {
 // apiSensor is the handler for `/api/v0/sensor/`.
 // Returns a list with the existing sensors.
 func apiSensor(w http.ResponseWriter, r *http.Request, id int) {
-
+	data, err := a.ListSensors()
+	errs.F_err(err)
+	log.Printf("[%s] returning %T of len %d",r.URL.Path,data,len(data))
+	sendAsJson(w,data)
 }
 
 // apiSensorData is the handler for `/api/v0/sensor/([0-9]+)/data/`.
@@ -79,6 +82,7 @@ func apiSensorData(w http.ResponseWriter, r *http.Request, id int) {
 	// Get data from DB
 	data, err := a.ListDataEntries(s) // []DataEntry
 	errs.F_err(err)
+	log.Printf("[%s] returning %T of len %d",r.URL.Path,data,len(data))
 	sendAsJson(w, data)
 }
 
