@@ -17,8 +17,8 @@ export class GraphComponent implements OnInit {
   constructor(private apiService: ApiService, private router: Router) { }
 
   ngOnInit(): void {
-    this.data.x = [0,1,2,3,4,5];
-    this.data.y = [5, 20, 36, 10, 10, 20];
+    //this.data.x = [0,1,2,3,4,5];
+    //this.data.y = [5, 20, 36, 10, 10, 20];
     this.getData();
   }
 

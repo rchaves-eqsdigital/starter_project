@@ -1,5 +1,5 @@
 export class Logging {
-    static log(s: string): void {
+    static log(s: any): void {
         let caller = this.getParent();
         console.log(`[${caller}] ${s}`)
     }

@@ -34,7 +34,6 @@ export class LineEchartsComponent implements OnInit, OnChanges {
   private echartInit(): void {
     use([LineChart, GridComponent, CanvasRenderer]);
     this.chart = init(this.canvas.nativeElement);
-    this.update();
   }
 
   private update(): void {

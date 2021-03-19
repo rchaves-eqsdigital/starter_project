@@ -1,14 +1,15 @@
-import { Component, ElementRef, Input, ViewChild, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, OnInit, OnChanges } from '@angular/core';
+import { Logging } from '../logging';
 
 @Component({
   selector: 'app-line-canvas',
   templateUrl: './line-canvas.component.html',
   styleUrls: ['./line-canvas.component.css']
 })
-export class LineCanvasComponent implements OnInit {
+export class LineCanvasComponent implements OnInit, OnChanges {
 
   @Input()
-  data: {x:number[],y:number[]};
+  data: {x:number[],y:number[]}; // TODO: Data is already fixed to the right format by `line-chartjs.component.ts`
 
   @ViewChild('canvas', {static: true})
   private canvas: ElementRef;
@@ -21,6 +22,12 @@ export class LineCanvasComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    if (this.data.x.length > 0) {
+      this.canvasRun();
+    }
+  }
+
+  ngOnChanges(): void {
     this.canvasRun();
   }
 

@@ -23,7 +23,7 @@ export class LineChartjsComponent implements OnInit, OnChanges {
   constructor() { }
 
   ngOnInit(): void {
-    if (this.context === null && this.chart === null && this.dataset === null) {
+    if (this.chart === null) {
       this.chartjsInit();
     }
   }
@@ -44,7 +44,7 @@ export class LineChartjsComponent implements OnInit, OnChanges {
 			}]
 		};
     this.context = this.canvas.nativeElement.getContext('2d');
-    chart.Chart.register(chart.LineController, chart.LineElement, chart.PointElement, chart.LinearScale, chart.TimeScale, chart.Title);
+    chart.Chart.register(chart.LineController, chart.LineElement, chart.PointElement, chart.LinearScale, chart.Title);
     this.chart = new chart.Chart(this.context, {
 			type: 'line',
 			data: this.dataset,
@@ -66,7 +66,7 @@ export class LineChartjsComponent implements OnInit, OnChanges {
 				},
         scales: {
 					x: {
-						type: 'linear'
+						type: 'linear' // TODO: fix!, get this working with time
 					}
 				},
 				interaction: {mode: 'nearest'}
@@ -76,6 +76,9 @@ export class LineChartjsComponent implements OnInit, OnChanges {
 
   private chartjsUpdate(): void {
     this.ngOnInit(); // Initialize if needed
+    for (let i = 0; i < this.data.x.length; i++) { // WIP: Duct tape ^
+      this.data.x[i] = i;
+    }
     this.dataset.datasets[0].data = this.rollUp(this.data.x,this.data.y);
     this.chart.update();
   }
