@@ -6,7 +6,11 @@ export class Sensor implements Item {
     private Body: String;
 
     constructor(pic: String, name: String, body: String="regular sensor") {
-        this.Pic = pic;
+        if (pic === null) {
+            this.Pic = "";
+        } else {
+            this.Pic = pic;
+        }
         this.Name = name;
         this.Body = body;
     }
@@ -15,7 +19,7 @@ export class Sensor implements Item {
      * getPic
      */
     public getPic(): String {
-        return this.Pic === null ? "" : this.Pic;
+        return this.Pic;
     }
 
     /**

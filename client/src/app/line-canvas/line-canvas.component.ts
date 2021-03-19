@@ -9,7 +9,7 @@ import { Logging } from '../logging';
 export class LineCanvasComponent implements OnInit, OnChanges {
 
   @Input()
-  data: {x:number[],y:number[]}; // TODO: Data is already fixed to the right format by `line-chartjs.component.ts`
+  data: {x:number[],y:number[]}; // TODO: Data is already in the right format thanks to `line-chartjs.component.ts`
 
   @ViewChild('canvas', {static: true})
   private canvas: ElementRef;
@@ -40,7 +40,7 @@ export class LineCanvasComponent implements OnInit, OnChanges {
       return Math.max(a,b);
     }
     let max_x = this.data.x.reduce(m);
-    let max_y = this.data.y.reduce(m);
+    let max_y = this.data.y.reduce(m); // TODO: fix "reduce of empty array with no initial value"
 
     let x_scale = (canvas.width-5)/max_x;
     let y_scale = (canvas.height)/max_y;

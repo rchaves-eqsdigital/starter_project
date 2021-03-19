@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { ApiService } from '../api.service';
@@ -14,19 +14,20 @@ export class GraphComponent implements OnInit {
   
   data: {x:any[],y:number[]} = {x:[],y:[]};
 
+  @Input()
+  id: string;
+
   constructor(private apiService: ApiService, private router: Router) { }
 
   ngOnInit(): void {
-    //this.data.x = [0,1,2,3,4,5];
-    //this.data.y = [5, 20, 36, 10, 10, 20];
     this.getData();
   }
 
   getData(): void {
     if (!environment.production) { Logging.log(this.router.url); }
-    this.apiService.getSensorData("3")
+    this.apiService.getSensorData(this.id)
         .subscribe((data) => {
-          if (!environment.production) { Logging.log("Got data with len "+data.length); }
+          if (!environment.production) { Logging.log("[graph] Got data with len "+data.length); }
           this.data = this.parseDataEntries(data);
         });
   }

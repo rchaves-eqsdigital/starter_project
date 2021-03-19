@@ -1,11 +1,11 @@
 <app-top-nav back="{{this.getBack()}}"></app-top-nav>
 
-<div class="content">
+<div class="content" *ngIf="item">
     <img src="{{item.getPic()}}"/>
     <h2>{{item.getTitle()}}</h2>
     <p>{{item.getBody()}}</p>
     <app-item-form [item]="item"></app-item-form>
-    <app-graph *ngIf="this.item.constructor.name === 'Sensor'"></app-graph>
+    <app-graph *ngIf="this.getBack().includes('sensor')" [id]="this.getID()"></app-graph>
 </div>
 
 <app-float-button></app-float-button>
