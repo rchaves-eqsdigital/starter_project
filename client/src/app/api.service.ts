@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { DataEntry } from './data-entry';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
@@ -13,6 +13,10 @@ import { Sensor } from './sensors/sensor';
 export class ApiService {
 
   private apiURL = "http://localhost:8080/api/v0/";
+
+  private httpOptions = {
+    headers: new HttpHeaders({'Content-Type': 'application/json'})
+  };
 
   constructor(private http: HttpClient) { }
 
@@ -41,6 +45,7 @@ export class ApiService {
     let url: string = this.apiURL+"sensor";
     if (!environment.production) { Logging.log(url); }
     const data = await this.http.get<any[]>(url).toPromise()
+    
     for (let i = 0; i < data.length; i++) {
       if (data[i].ID == id) {
         let ret = new Sensor(null,data[i].ID,data[i].RoomID);
@@ -49,6 +54,10 @@ export class ApiService {
       }
     }
     return null;
+  }
+
+  edit(type: string, data:any): Promise<any> {
+    return this.http.post(this.apiURL+type+"/edit",data).toPromise();
   }
 
   private handleError<T>(operation='operation',result?: T) {

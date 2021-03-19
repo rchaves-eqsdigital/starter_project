@@ -240,17 +240,27 @@ func (a *App) DeleteSensor(id int) error {
 	sensor.ID = uint(id)
 	err := a.DB_s.First(&sensor, 1).Error
 	if err != nil {
-		log.Fatalln("couldn't find sensor with ID", id)
+		log.Println("couldn't find sensor with ID", id)
+		return err
 	}
 
 	err = a.DB_s.Delete(&sensor, 1).Error
 	if err != nil {
-		log.Fatalln("couldn't delete sensor", sensor)
+		log.Println("couldn't delete sensor", sensor)
+		return err
 	}
 	return nil
 }
 
-func (a *App) UpdateSensor() error {
+func (a *App) UpdateSensor(id int, roomid string) error {
+	sensor := &Sensor{}
+	err := a.DB_s.First(sensor, id).Error
+	if err != nil {
+		log.Println("couldn't find sensor with ID", id)
+		return err
+	}
+	sensor.RoomID = roomid
+	a.DB_s.Save(sensor)
 	return nil
 }
 

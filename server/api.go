@@ -1,13 +1,14 @@
 package main
 
 import (
+	"./errs"
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"regexp"
 	"strconv"
 	"sync"
-	"encoding/json"
-	"./errs"
 )
 
 func (a App) Run() {
@@ -37,12 +38,16 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 		handler = apiSensorDataAdd
 	case match(p, "/api/v0/sensor/add"):
 		handler = apiSensorAdd
+	case match(p, "/api/v0/sensor/edit"):
+		handler = apiSensorEdit
 	case match(p, "/api/v0/user"):
 		handler = apiUser
 	case match(p, "/api/v0/user/([0-9]+)/data", &id):
 		handler = apiUserData
 	case match(p, "/api/v0/user/add"):
 		handler = apiUserAdd
+	case match(p, "/api/v0/user/edit"):
+		handler = apiUserEdit
 	default:
 		http.NotFound(w,r)
 		return
@@ -114,6 +119,35 @@ func apiUserData(w http.ResponseWriter, r *http.Request, id int) {
 // Add user.
 func apiUserAdd(w http.ResponseWriter, r *http.Request, id int) {
 
+}
+
+// apiSensorEdit is the handler for `/api/v0/sensor/edit`.
+// It edits a sensor in the DB.
+func apiSensorEdit(w http.ResponseWriter, r *http.Request, id int) {
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+	raw_body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println("error in body",err.Error())
+		return
+	}
+	var body map[string]string
+	err = json.Unmarshal(raw_body, &body)
+	if err != nil {
+		log.Println("error decoding JSON", err.Error())
+		return
+	}
+	log.Printf("[%s] received %s",r.URL.Path,body)
+	sensorID, _ := strconv.Atoi(body["id"])
+	err = a.UpdateSensor(sensorID, body["data"])
+	if err != nil {
+		log.Println("error updating sensor",err.Error())
+	}
+}
+
+// apiUserEdit is the handler for `/api/v0/user/edit`.
+// It edits a user in the DB.
+func apiUserEdit(w http.ResponseWriter, r *http.Request, id int) {
+	log.Println(r.Header,r.PostForm,r.Form,r.Body)
 }
 
 // sendAsJson takes a val of any type, converts it to JSON and writes it to

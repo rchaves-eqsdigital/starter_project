@@ -20,6 +20,16 @@ export class ItemDetailsComponent implements OnInit {
     this.item = await this.getData();
   }
 
+  getType(): string {
+    if (this.route.snapshot.routeConfig.path.split("/")[0].includes("sensor")) {
+      return "sensor";
+    } else if (this.route.snapshot.routeConfig.path.split("/")[0].includes("user")) {
+      return "user";
+    } else {
+      return "";
+    }
+  }
+
   getBack(): string {
     return this.route.snapshot.routeConfig.path.split("/")[0];
   }

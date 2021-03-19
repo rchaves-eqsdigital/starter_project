@@ -1,4 +1,5 @@
 import { Component, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { ApiService } from '../api.service';
 import { Item } from '../item-list/item';
 
 @Component({
@@ -8,9 +9,18 @@ import { Item } from '../item-list/item';
 })
 export class ItemFormComponent implements OnInit {
   @Input()
-  public item: Item;
+  item: Item;
 
-  constructor() { }
+  @Input()
+  type: string;
+
+  @Input()
+  id: string;
+
+  @ViewChild("textbox")
+  value: ElementRef;
+
+  constructor(private apiService: ApiService) { }
 
   ngOnInit(): void {
     this.initModal();
@@ -44,20 +54,16 @@ export class ItemFormComponent implements OnInit {
     } 
   }
 
-  public formClick(): void {
-    alert("Saved!");
+  public async formClick(): Promise<void> {
+    let data = this.value.nativeElement.value; // TODO: do this with JSON ({fieldToEdit: newValue})
+    console.log(data);
+    if (data.length == 0) {
+      alert("Invalid text.");
+      return;
+    }
+    let payload = {'id':this.id,'data':data};
+    await this.apiService.edit(this.type,JSON.stringify(payload));
+    alert("Saved! Refresh page to see the changes."); // TODO: Updated field on screen when it's changed.
     document.getElementById("myModal").style.display = "none";
-    // TODO: Save
   }
 }
-
-/*
-var readonly = true;
-$('.example input[type="button"]').on('click', function() {
-    $('.example input[type="text"]').attr('readonly', !readonly);
-
-    readonly = !readonly;
-    $('.example input[type="button"]').val( readonly ? 'Edit' : 'Save' );
-    return false;
-});
-*/
