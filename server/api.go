@@ -124,7 +124,7 @@ func apiUserAdd(w http.ResponseWriter, r *http.Request, id int) {
 // apiSensorEdit is the handler for `/api/v0/sensor/edit`.
 // It edits a sensor in the DB.
 func apiSensorEdit(w http.ResponseWriter, r *http.Request, id int) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	raw_body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Println("error in body",err.Error())
@@ -156,7 +156,7 @@ func sendAsJson(w http.ResponseWriter, val interface{}) {
 	// Marshall data to JSON
 	ret, _ := json.Marshal(val)
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Write(ret)
 }
 
