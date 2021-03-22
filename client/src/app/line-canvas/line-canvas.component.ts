@@ -21,9 +21,10 @@ export class LineCanvasComponent implements OnInit, OnChanges {
 
   /* ANIMATION */
   private start = null;
-  private max_duration = 2000; // ms
+  private max_duration = 1000; // ms
   private x_scale = null;
   private y_scale = null;
+  private ctx = null;
 
   constructor() { }
 
@@ -42,6 +43,7 @@ export class LineCanvasComponent implements OnInit, OnChanges {
   private canvasRun(): void {
     let canvas = this.canvas.nativeElement;
     let ctx = this.setupCanvas(canvas);
+    this.ctx = ctx;
     ctx.lineWidth = 2;
 
     function m(a,b) {
@@ -61,21 +63,9 @@ export class LineCanvasComponent implements OnInit, OnChanges {
 
     this.c_init(ctx,canvas.width,canvas.height);
     this.drawGrid(ctx,canvas.width,canvas.height);
-    let f = this.anim_step;
     window.requestAnimationFrame(function(ts){
-      f(ctx,ts)
-    });
-    /*
-    for (let i = 0; i < this.data.x.length; i++) {
-      let x = this.data.x[i];
-      let y = this.data.y[i];
-      let d_x = (x*this.x_scale)-this.pos.x;
-      let d_y = (y*this.y_scale)-y-this.pos.y;
-      this.line(this.ctx,d_x,d_y);
-      this.arc(this.ctx,d_x,d_y,2);
-    }
-    this.ctx.stroke();
-    */
+      this.anim_step(ctx,ts);
+    }.bind(this));
   }
 
   private c_init(ctx: CanvasRenderingContext2D, c_x: number, c_y: number, x_off: number=0, y_off: number=0): void {
@@ -163,18 +153,20 @@ export class LineCanvasComponent implements OnInit, OnChanges {
     // Animation end
     if (dx < this.max_duration) {
       window.requestAnimationFrame(function(ts){
-        this.anim_step(ctx,ts)
-      });
+        this.anim_step(ctx,ts);
+      }.bind(this));
     }
   }
 
   private anim_draw(ctx: CanvasRenderingContext2D, i: number): void {
+    console.log(i);
     let x = this.data.x[i];
     let y = this.data.y[i];
     let d_x = (x*this.x_scale)-this.pos.x;
     let d_y = (y*this.y_scale)-y-this.pos.y;
     this.line(ctx,d_x,d_y);
     this.arc(ctx,d_x,d_y,2);
+    ctx.stroke();
   }
 
 }
