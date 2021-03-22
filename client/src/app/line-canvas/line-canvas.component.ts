@@ -19,6 +19,12 @@ export class LineCanvasComponent implements OnInit, OnChanges {
   // real pos
   private pos_r: {x:number,y:number} = {x:0,y:0};
 
+  /* ANIMATION */
+  private start = null;
+  private max_duration = 2000; // ms
+  private x_scale = null;
+  private y_scale = null;
+
   constructor() { }
 
   ngOnInit(): void {
@@ -44,8 +50,8 @@ export class LineCanvasComponent implements OnInit, OnChanges {
     let max_x = this.data.x.reduce(m);
     let max_y = this.data.y.reduce(m);
 
-    let x_scale = (canvas.width-5)/max_x;
-    let y_scale = (canvas.height)/max_y;
+    this.x_scale = (canvas.width-5)/max_x;
+    this.y_scale = (canvas.height)/max_y;
 
     // Confirm that both data arrays have equal length
     if (this.data.x.length != this.data.y.length) {
@@ -55,15 +61,21 @@ export class LineCanvasComponent implements OnInit, OnChanges {
 
     this.c_init(ctx,canvas.width,canvas.height);
     this.drawGrid(ctx,canvas.width,canvas.height);
+    let f = this.anim_step;
+    window.requestAnimationFrame(function(ts){
+      f(ctx,ts)
+    });
+    /*
     for (let i = 0; i < this.data.x.length; i++) {
       let x = this.data.x[i];
       let y = this.data.y[i];
-      let d_x = (x*x_scale)-this.pos.x;
-      let d_y = (y*y_scale)-y-this.pos.y;
-      this.line(ctx,d_x,d_y);
-      this.arc(ctx,d_x,d_y,2);
+      let d_x = (x*this.x_scale)-this.pos.x;
+      let d_y = (y*this.y_scale)-y-this.pos.y;
+      this.line(this.ctx,d_x,d_y);
+      this.arc(this.ctx,d_x,d_y,2);
     }
-    ctx.stroke();
+    this.ctx.stroke();
+    */
   }
 
   private c_init(ctx: CanvasRenderingContext2D, c_x: number, c_y: number, x_off: number=0, y_off: number=0): void {
@@ -141,6 +153,28 @@ export class LineCanvasComponent implements OnInit, OnChanges {
     // don't have to worry about the difference.
     ctx.scale(dpr, dpr);
     return ctx;
+  }
+
+  private anim_step(ctx: CanvasRenderingContext2D, ts: number): void {
+    if (!this.start) this.start = ts;
+    let dx = ts - this.start;
+    let pos = Math.floor((dx*this.data.x.length)/this.max_duration); // element to be drawn at each `dx`
+    this.anim_draw(ctx, pos);
+    // Animation end
+    if (dx < this.max_duration) {
+      window.requestAnimationFrame(function(ts){
+        this.anim_step(ctx,ts)
+      });
+    }
+  }
+
+  private anim_draw(ctx: CanvasRenderingContext2D, i: number): void {
+    let x = this.data.x[i];
+    let y = this.data.y[i];
+    let d_x = (x*this.x_scale)-this.pos.x;
+    let d_y = (y*this.y_scale)-y-this.pos.y;
+    this.line(ctx,d_x,d_y);
+    this.arc(ctx,d_x,d_y,2);
   }
 
 }
