@@ -67,9 +67,28 @@ func apiLogout(w http.ResponseWriter, r *http.Request, id int) {
 
 // apiSensor is the handler for `/api/v0/sensor/`.
 // Returns a list with the existing sensors.
+// If the `id=number` parameter is present, it instead returns the
+// sensor with that ID.
 func apiSensor(w http.ResponseWriter, r *http.Request, id int) {
 	data, err := a.ListSensors()
 	errs.F_err(err)
+	keys, ok := r.URL.Query()["id"]
+	if ok {
+		// Asking for a single sensor with id in GET parameters
+		id, err = strconv.Atoi(keys[0])
+		if err != nil {
+			log.Println("error parsing GET[id]",err.Error())
+			return
+		}
+		// Search ID in data
+		for _, d := range data {
+			if int(d.ID) == id {
+				log.Printf("[%s] returning sensor with ID %d",r.URL.Path,id)
+				sendAsJson(w,d)
+				return
+			}
+		}
+	}
 	log.Printf("[%s] returning %T of len %d",r.URL.Path,data,len(data))
 	sendAsJson(w,data)
 }

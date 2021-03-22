@@ -42,18 +42,12 @@ export class ApiService {
 
   // Sensor, sensors.go
   async getSensor(id: string): Promise<any> {
-    let url: string = this.apiURL+"sensor";
+    let url: string = this.apiURL+"sensor?id="+id;
     if (!environment.production) { Logging.log(url); }
-    const data = await this.http.get<any[]>(url).toPromise()
-    
-    for (let i = 0; i < data.length; i++) {
-      if (data[i].ID == id) {
-        let ret = new Sensor(null,data[i].ID,data[i].RoomID);
-        if (!environment.production) { Logging.log("[getSensor] Got item: "+data[i]); }
-        return ret;
-      }
-    }
-    return null;
+    const data = await this.http.get<any>(url).toPromise()
+    let ret = new Sensor(null,data.ID,data.RoomID);
+    if (!environment.production) { Logging.log("[getSensor] Got item: "+ret); }
+    return ret;
   }
 
   edit(type: string, data:any): Promise<any> {
