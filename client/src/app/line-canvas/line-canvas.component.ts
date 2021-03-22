@@ -28,7 +28,9 @@ export class LineCanvasComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
-    this.canvasRun();
+    if (this.data.x.length > 0) {
+      this.canvasRun();
+    }
   }
 
   private canvasRun(): void {
@@ -40,7 +42,7 @@ export class LineCanvasComponent implements OnInit, OnChanges {
       return Math.max(a,b);
     }
     let max_x = this.data.x.reduce(m);
-    let max_y = this.data.y.reduce(m); // TODO: fix "reduce of empty array with no initial value"
+    let max_y = this.data.y.reduce(m);
 
     let x_scale = (canvas.width-5)/max_x;
     let y_scale = (canvas.height)/max_y;
