@@ -21,7 +21,8 @@ export class LineCanvasComponent implements OnInit, OnChanges {
 
   /* ANIMATION */
   private start = null;
-  private max_duration = 1000; // ms
+  private prev_i = 0;
+  private max_duration = 1500; // ms
   private x_scale = null;
   private y_scale = null;
   private ctx = null;
@@ -159,14 +160,16 @@ export class LineCanvasComponent implements OnInit, OnChanges {
   }
 
   private anim_draw(ctx: CanvasRenderingContext2D, i: number): void {
-    console.log(i);
-    let x = this.data.x[i];
-    let y = this.data.y[i];
-    let d_x = (x*this.x_scale)-this.pos.x;
-    let d_y = (y*this.y_scale)-y-this.pos.y;
-    this.line(ctx,d_x,d_y);
-    this.arc(ctx,d_x,d_y,2);
-    ctx.stroke();
+    for(;this.prev_i<i;this.prev_i++){
+      let x = this.data.x[this.prev_i];
+      let y = this.data.y[this.prev_i];
+      let d_x = (x*this.x_scale)-this.pos.x;
+      let d_y = (y*this.y_scale)-y-this.pos.y;
+      this.line(ctx,d_x,d_y);
+      this.arc(ctx,d_x,d_y,2);
+      ctx.stroke();
+    }
+    this.prev_i = i;
   }
 
 }
