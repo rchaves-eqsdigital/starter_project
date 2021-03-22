@@ -33,7 +33,7 @@ export class LineChartjsComponent implements OnInit, OnChanges {
   }
 
   private chartjsInit(): void {
-    const color: string = '#f00';
+    const color: string = getComputedStyle(document.querySelector('body')).getPropertyValue('--brand-normal');
     this.dataset = {
 			labels: [],
 			datasets: [{
@@ -66,8 +66,16 @@ export class LineChartjsComponent implements OnInit, OnChanges {
 				},
         scales: {
 					x: {
+            gridLines: {
+              color: getComputedStyle(document.querySelector('body')).getPropertyValue('--gray-2')
+            },
 						type: 'linear' // TODO: fix!, get this working with time
-					}
+					},
+          y: {
+            gridLines: {
+              color: getComputedStyle(document.querySelector('body')).getPropertyValue('--gray-2')
+            }
+          }          
 				},
 				interaction: {mode: 'nearest'}
 			}

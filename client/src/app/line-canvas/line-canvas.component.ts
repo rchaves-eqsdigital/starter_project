@@ -71,6 +71,8 @@ export class LineCanvasComponent implements OnInit, OnChanges {
     this.pos.y = 0;
     this.pos_r.x = 0.5+x_off;
     this.pos_r.y = c_y-y_off;
+    let color = getComputedStyle(document.querySelector('body')).getPropertyValue('--brand-normal');
+    ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.moveTo(this.pos_r.x, this.pos_r.y);
   }
@@ -80,7 +82,7 @@ export class LineCanvasComponent implements OnInit, OnChanges {
     ctx.save();
 
     ctx.lineWidth = 1;
-    ctx.strokeStyle="rgba(0,0,0,0.3)";
+    ctx.strokeStyle = getComputedStyle(document.querySelector('body')).getPropertyValue('--gray-2');
     ctx.beginPath();
     let h_s = 62; // TODO: I think this is not accurate for every canvas size
     // Vertical lines

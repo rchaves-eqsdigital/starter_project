@@ -41,11 +41,23 @@ export class LineEchartsComponent implements OnInit, OnChanges {
     let option = {
       tooltip: {},
       xAxis: {
-          data: this.data.x
+          data: this.data.x,
+          splitLine: {
+            lineStyle: {
+              color: getComputedStyle(document.querySelector('body')).getPropertyValue('--gray-2')
+            }
+          }
       },
-      yAxis: {},
+      yAxis: {
+        splitLine: {
+          lineStyle: {
+            color: getComputedStyle(document.querySelector('body')).getPropertyValue('--gray-2')
+          }
+        }
+      },
       series: [{
           type: 'line',
+          color: getComputedStyle(document.querySelector('body')).getPropertyValue('--brand-normal'),
           data: this.data.y
       }]
     };
