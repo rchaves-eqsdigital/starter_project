@@ -54,6 +54,11 @@ export class ApiService {
     return this.http.post(this.apiURL+type+"/edit",data).toPromise();
   }
 
+  login(email: string, password: string): Promise<any> {
+    let data = JSON.stringify({'email': email, 'password': password});
+    return this.http.post(this.apiURL+"login",data).toPromise();
+  }
+
   private handleError<T>(operation='operation',result?: T) {
     return (error: any): Observable<T> => {
       Logging.log(error); // log to console

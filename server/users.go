@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
-
 	"./errs"
+	"errors"
+	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -18,7 +19,7 @@ type User struct {
 
 type Session struct {
 	gorm.Model
-	U     User
+	Email string
 	Tok   string
 	Valid bool
 }
@@ -30,8 +31,26 @@ func (u *User) String() string {
 // LOGIN / LOGOUT? token, cookies, etc etc
 // - Sessão c/ UUID (guardar em BE dados como data de acesso, IP, etc.)
 func (a *App) Login(email string, hash []byte) error {
+	// Validate user
+	users, err := a.ListUsersEmail(email)
+	invalid := errors.New("invalid credentials")
+	if err != nil {
+		return err
+	}
+	if len(users) == 0 {
+		// User with the provided email doesn't exist.
+		// Spend time anyway, so a potential attacker doesn't know if it's
+		// wrong user, wrong password, or both.
+		bcrypt.GenerateFromPassword([]byte("nop"),a.hashCost)
+		return invalid
+	}
+	user := users[0]
+	err = bcrypt.CompareHashAndPassword(user.Password,hash)
+	if err != nil {
+		return invalid
+	}
 	// Check if user already has an active session
-	_, err := a.sessionGet_email(email)
+	_, err = a.sessionGetEmail(email)
 	if err != nil {
 		return err // user already logged in
 	}
@@ -46,7 +65,7 @@ func (a *App) Login(email string, hash []byte) error {
 // Logs out and invalidates session
 func (a *App) Logout(email string) error {
 	// Check if user is logged in
-	session, err := a.sessionGet_email(email)
+	session, err := a.sessionGetEmail(email)
 	if err != nil {
 		return err
 	}
@@ -68,12 +87,24 @@ func (a *App) InitUserDB() error {
 	})
 	errs.F_err(err)
 
-	return a.DB_u.AutoMigrate(&User{}, &Sensor{})
+	return a.DB_u.AutoMigrate(&User{}, &Session{})
 }
 
 // Creates a new user/account
-func (a *App) CreateUser(email string, hash []byte) error {
-	a.DB_u.Create(&User{Email: email, Password: hash})
+func (a *App) CreateUser(email string, firstHash []byte) error {
+	// Generating a random salt isn't required, already handled by bcrypt
+	// Appending it to the base hash
+	var err error
+	var hash []byte
+	hash, err = bcrypt.GenerateFromPassword(firstHash,a.hashCost)
+	if err != nil {
+		return err
+	}
+	// Creating user in the DB
+	err = a.DB_u.Create(&User{Email: email, Password: hash}).Error
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -83,9 +114,9 @@ func (a *App) ListUsers() ([]User, error) {
 	return users, err
 }
 
-func (a *App) ListUsers_email(email string) ([]User, error) {
+func (a *App) ListUsersEmail(email string) ([]User, error) {
 	var users []User
-	err := a.DB_u.Where("Email LIKE ?", fmt.Sprintf("%%%s%%", email)).Find(&users).Error
+	err := a.DB_u.Where("Email = ?", email).Find(&users).Error
 	return users, err
 }
 
@@ -100,14 +131,14 @@ func (a *App) DeleteUser(email string) error {
 }
 
 // Takes session token, returns (Session,error)
-func (a *App) sessionGet_tok(tok string) (*Session, error) {
+func (a *App) sessionGetTok(tok string) (*Session, error) {
 	var s *Session
 	err := a.DB_u.Where("Tok LIKE ?", fmt.Sprintf("%%%s%%",tok)).Find(s).Error
 	return s, err
 }
 
 // Takes user's email, returns (Session,error)
-func (a *App) sessionGet_email(email string) (*Session, error) {
+func (a *App) sessionGetEmail(email string) (*Session, error) {
 	// First, get User
 	/*
 	var u *User

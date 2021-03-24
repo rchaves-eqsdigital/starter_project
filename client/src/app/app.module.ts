@@ -17,6 +17,7 @@ import { LineChartjsComponent } from './line-chartjs/line-chartjs.component';
 import { LineCanvasComponent } from './line-canvas/line-canvas.component';
 import { ItemFormComponent } from './item-form/item-form.component';
 import { HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { HttpClientModule } from '@angular/common/http';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

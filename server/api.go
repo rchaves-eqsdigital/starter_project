@@ -2,6 +2,7 @@ package main
 
 import (
 	"./errs"
+	"encoding/hex"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -57,7 +58,32 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 
 // apiLogin is the handler for `/api/v0/login/`.
 func apiLogin(w http.ResponseWriter, r *http.Request, id int) {
-
+	if origin := r.Header.Get("Origin"); origin != "" {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+	} else {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+	}
+	raw_body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println("error in body",err.Error())
+		return
+	}
+	var body map[string]string
+	err = json.Unmarshal(raw_body, &body)
+	if err != nil {
+		log.Println("error decoding JSON", err.Error())
+		return
+	}
+	log.Printf("[%s] received %s",r.URL.Path,body["email"])
+	var hash []byte
+	hash, err = hex.DecodeString(body["password"])
+	err = a.Login(body["email"], hash)
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+	log.Printf("[%s] %s logged in",r.URL.Path,body["email"])
+	// TODO: response
 }
 
 // apiLogout is the handler for `/api/v0/logout/`.
@@ -77,7 +103,7 @@ func apiSensor(w http.ResponseWriter, r *http.Request, id int) {
 		// Asking for a single sensor with id in GET parameters
 		id, err = strconv.Atoi(keys[0])
 		if err != nil {
-			log.Println("error parsing GET[id]",err.Error())
+			log.Println("error parsing GET[id]",err.Error()) //TODO: return error
 			return
 		}
 		// Search ID in data
@@ -105,7 +131,7 @@ func apiSensorData(w http.ResponseWriter, r *http.Request, id int) {
 	}
 	// Get data from DB
 	data, err := a.ListDataEntries(s) // []DataEntry
-	errs.F_err(err)
+	errs.F_err(err) //TODO: return error
 	log.Printf("[%s] returning %T of len %d",r.URL.Path,data,len(data))
 	sendAsJson(w, data)
 }
@@ -178,6 +204,24 @@ func sendAsJson(w http.ResponseWriter, val interface{}) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Write(ret)
 }
+
+// getPostBody takes a request, and if it is POST, returns a `map[string]string
+// of its body
+func getPostBody(r *http.Request) {
+	raw_body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println("error in body",err.Error())
+		return
+	}
+	var body map[string]string
+	err = json.Unmarshal(raw_body, &body)
+	if err != nil {
+		log.Println("error decoding JSON", err.Error())
+		return
+	}
+}
+
+/***************** REGEX *********************/
 
 // match reports whether path matches regex ^pattern$, and if it matches,
 // assigns any capture groups to the *string or *int vars.

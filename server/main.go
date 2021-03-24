@@ -2,6 +2,7 @@ package main
 
 import (
 	"./errs"
+	"crypto/sha256"
 	"gorm.io/gorm"
 	"log"
 )
@@ -9,6 +10,7 @@ import (
 type App struct {
 	DB_u *gorm.DB // users db
 	DB_s *gorm.DB // sensors db
+	hashCost int // cost for bcrypt
 }
 
 var a = App{} // TODO: Fix, maybe singleton?
@@ -18,6 +20,15 @@ func (a *App) Init() error {
 	if err != nil {
 		return err
 	}
+	// user@user.com, user
+	log.Println("[init] Creating default user...")
+	username := "user@user.com"
+	password := "user"
+	hash := sha256.Sum256([]byte(password))
+	a.hashCost = 15// 2s on a 9700k
+	err = a.CreateUser(username,hash[:])
+	errs.F_err(err)
+	log.Println("[init] User created.")
 
 	err = a.InitSensorDB()
 	return err
