@@ -58,6 +58,7 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 
 // apiLogin is the handler for `/api/v0/login/`.
 func apiLogin(w http.ResponseWriter, r *http.Request, id int) {
+
 	if origin := r.Header.Get("Origin"); origin != "" {
 		w.Header().Set("Access-Control-Allow-Origin", origin)
 	} else {
@@ -157,7 +158,7 @@ func apiSensorAdd(w http.ResponseWriter, r *http.Request, id int) {
 // Returns a list with the existing users.
 // TODO: Users are being returned with the full struct. Take password out.
 func apiUser(w http.ResponseWriter, r *http.Request, id int) {
-	data, err := a.ListUsers()
+	data, err := a.ListUsersClean()
 	errs.F_err(err)
 	keys, ok := r.URL.Query()["id"]
 	if ok {
@@ -187,7 +188,7 @@ func apiUser(w http.ResponseWriter, r *http.Request, id int) {
 // apiUserData is the handler for `/api/v0/user/([0-9]+)/data/`.
 // Get user data.
 func apiUserData(w http.ResponseWriter, r *http.Request, id int) {
-	data, err := a.ListUsers()
+	data, err := a.ListUsersClean()
 	errs.F_err(err)
 	// Search ID in data
 	for _, d := range data {

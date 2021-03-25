@@ -116,9 +116,33 @@ func (a *App) ListUsers() ([]User, error) {
 	return users, err
 }
 
+func (a *App) ListUsersClean() ([]User, error) {
+	users, err := a.ListUsers()
+	if err != nil {
+		return nil, err
+	}
+	for i:=0; i<len(users); i++ {
+		users[i].Password = nil
+		users[i].Tok = ""
+	}
+	return users, err
+}
+
 func (a *App) ListUsersEmail(email string) ([]User, error) {
 	var users []User
 	err := a.DB_u.Where("Email = ?", email).Find(&users).Error
+	return users, err
+}
+
+func (a *App) ListUsersEmailClean(email string) ([]User, error) {
+	users, err := a.ListUsersEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	for i:=0; i<len(users); i++ {
+		users[i].Password = nil
+		users[i].Tok = ""
+	}
 	return users, err
 }
 
