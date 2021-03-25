@@ -90,14 +90,18 @@ func apiLogin(w http.ResponseWriter, r *http.Request, id int) {
 
 // apiLogout is the handler for `/api/v0/logout/`.
 func apiLogout(w http.ResponseWriter, r *http.Request, id int) {
-	enableCors(&w)
-	if r.Method == "OPTIONS" {
+	if !corsAndAuth(&w,r) {
 		return
 	}
-	if err := auth(r); err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	body, err := getPostBody(r)
+	if err != nil {
+		sendError(w, err)
 		return
 	}
+	log.Printf("[%s] logging out %s", r.URL.Path, body["token"])
+	ret := make(map[string]string)
+	ret["ok"] = "true"
+	sendAsJson(w, ret)
 }
 
 // apiSensor is the handler for `/api/v0/sensor/`.
@@ -105,12 +109,7 @@ func apiLogout(w http.ResponseWriter, r *http.Request, id int) {
 // If the `id=number` parameter is present, it instead returns the
 // sensor with that ID.
 func apiSensor(w http.ResponseWriter, r *http.Request, id int) {
-	enableCors(&w)
-	if r.Method == "OPTIONS" {
-		return
-	}
-	if err := auth(r); err != nil {
-		http.Error(w, "", http.StatusUnauthorized)
+	if !corsAndAuth(&w,r) {
 		return
 	}
 	data, err := a.ListSensors()
@@ -143,12 +142,7 @@ func apiSensor(w http.ResponseWriter, r *http.Request, id int) {
 // Returns data of sensor `ID`.
 // TODO: don't return everything at once, implement chunked requests
 func apiSensorData(w http.ResponseWriter, r *http.Request, id int) {
-	enableCors(&w)
-	if r.Method == "OPTIONS" {
-		return
-	}
-	if err := auth(r); err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	if !corsAndAuth(&w,r) {
 		return
 	}
 	// Check if ID is valid
@@ -167,12 +161,7 @@ func apiSensorData(w http.ResponseWriter, r *http.Request, id int) {
 // apiSensorDataAdd is the handler for `/api/v0/sensor/([0-9]+)/data/add`.
 // Add sensor data reading.
 func apiSensorDataAdd(w http.ResponseWriter, r *http.Request, id int) {
-	enableCors(&w)
-	if r.Method == "OPTIONS" {
-		return
-	}
-	if err := auth(r); err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	if !corsAndAuth(&w,r) {
 		return
 	}
 	log.Println(r.URL.Path, id)
@@ -181,12 +170,7 @@ func apiSensorDataAdd(w http.ResponseWriter, r *http.Request, id int) {
 // apiSensor add is the handler for `/api/v0/sensor/add`.
 // Add new sensor.
 func apiSensorAdd(w http.ResponseWriter, r *http.Request, id int) {
-	enableCors(&w)
-	if r.Method == "OPTIONS" {
-		return
-	}
-	if err := auth(r); err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	if !corsAndAuth(&w,r) {
 		return
 	}
 }
@@ -195,12 +179,7 @@ func apiSensorAdd(w http.ResponseWriter, r *http.Request, id int) {
 // Returns a list with the existing users.
 // TODO: Users are being returned with the full struct. Take password out.
 func apiUser(w http.ResponseWriter, r *http.Request, id int) {
-	enableCors(&w)
-	if r.Method == "OPTIONS" {
-		return
-	}
-	if err := auth(r); err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	if !corsAndAuth(&w,r) {
 		return
 	}
 	data, err := a.ListUsersClean()
@@ -232,12 +211,7 @@ func apiUser(w http.ResponseWriter, r *http.Request, id int) {
 // apiUserData is the handler for `/api/v0/user/([0-9]+)/data/`.
 // Get user data.
 func apiUserData(w http.ResponseWriter, r *http.Request, id int) {
-	enableCors(&w)
-	if r.Method == "OPTIONS" {
-		return
-	}
-	if err := auth(r); err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	if !corsAndAuth(&w,r) {
 		return
 	}
 	data, err := a.ListUsersClean()
@@ -257,12 +231,7 @@ func apiUserData(w http.ResponseWriter, r *http.Request, id int) {
 // apiUserAdd is the handler for `/api/v0/user/add`.
 // Add user.
 func apiUserAdd(w http.ResponseWriter, r *http.Request, id int) {
-	enableCors(&w)
-	if r.Method == "OPTIONS" {
-		return
-	}
-	if err := auth(r); err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	if !corsAndAuth(&w,r) {
 		return
 	}
 }
@@ -270,12 +239,7 @@ func apiUserAdd(w http.ResponseWriter, r *http.Request, id int) {
 // apiSensorEdit is the handler for `/api/v0/sensor/edit`.
 // It edits a sensor in the DB.
 func apiSensorEdit(w http.ResponseWriter, r *http.Request, id int) {
-	enableCors(&w)
-	if r.Method == "OPTIONS" {
-		return
-	}
-	if err := auth(r); err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	if !corsAndAuth(&w,r) {
 		return
 	}
 	body, err := getPostBody(r)
@@ -295,12 +259,7 @@ func apiSensorEdit(w http.ResponseWriter, r *http.Request, id int) {
 // apiUserEdit is the handler for `/api/v0/user/edit`.
 // It edits a user in the DB.
 func apiUserEdit(w http.ResponseWriter, r *http.Request, id int) {
-	enableCors(&w)
-	if r.Method == "OPTIONS" {
-		return
-	}
-	if err := auth(r); err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	if !corsAndAuth(&w,r) {
 		return
 	}
 	body, err := getPostBody(r)
@@ -315,6 +274,22 @@ func apiUserEdit(w http.ResponseWriter, r *http.Request, id int) {
 		sendError(w, err)
 		return
 	}
+}
+
+/***********************************/
+/********** AUXILIARY **************/
+/***********************************/
+
+func corsAndAuth(w *http.ResponseWriter, r *http.Request) bool {
+	enableCors(w)
+	if r.Method == "OPTIONS" {
+		return false
+	}
+	if err := auth(r); err != nil {
+		http.Error((*w), "Unauthorized", http.StatusUnauthorized)
+		return false
+	}
+	return true
 }
 
 func auth(r *http.Request) error {

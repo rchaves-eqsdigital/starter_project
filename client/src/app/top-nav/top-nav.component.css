@@ -12,9 +12,14 @@
     padding: 10px;
 }
 
-.topnav a {
+#logout {
+    cursor: pointer;
+}
+
+.topnav .right {
     float: right;
     display: block;
+    column-gap: 40px;
     color: var(--gray-1);
     text-align: center;
     padding: 14px;

@@ -12,7 +12,6 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class LoginComponent implements OnInit {
   private invalidString = "The entered credentials are invalid."
-  private cookieValue: string;
 
   loginForm = this.formBuilder.group({
     email: '',

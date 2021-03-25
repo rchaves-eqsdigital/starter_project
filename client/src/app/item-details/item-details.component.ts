@@ -19,7 +19,6 @@ export class ItemDetailsComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.getData().then(response => {
       this.item = response;
-      console.log("response",response);
     }).catch(e => {
       let err = e.status+": "+e.statusText;
       document.getElementById("error").innerHTML=err;

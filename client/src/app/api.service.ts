@@ -89,6 +89,11 @@ export class ApiService {
     return this.http.post(this.apiURL+"login",data, this.requestOptions()).toPromise();
   }
 
+  logout(): Promise<any> {
+    let data = JSON.stringify({'token': this.girlScouts.get("token")});
+    return this.http.post(this.apiURL+"logout",data, this.requestOptions()).toPromise();
+  }
+
   private handleError<T>(operation='operation',result?: T) {
     return (error: any): Observable<T> => {
       Logging.log(error); // log to console
