@@ -16,9 +16,12 @@ import { LineEchartsComponent } from './line-echarts/line-echarts.component';
 import { LineChartjsComponent } from './line-chartjs/line-chartjs.component';
 import { LineCanvasComponent } from './line-canvas/line-canvas.component';
 import { ItemFormComponent } from './item-form/item-form.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
+import { Router } from '@angular/router';
+import { AuthInterceptor } from './auth-interceptor';
+import { Four04Component } from './four04/four04.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +38,8 @@ import { CookieService } from 'ngx-cookie-service';
     LineEchartsComponent,
     LineChartjsComponent,
     LineCanvasComponent,
-    ItemFormComponent
+    ItemFormComponent,
+    Four04Component
   ],
   imports: [
     BrowserModule,
@@ -43,7 +47,15 @@ import { CookieService } from 'ngx-cookie-service';
     HttpClientModule,
     ReactiveFormsModule
   ],
-  providers: [CookieService],
+  providers: [CookieService,
+  {
+    provide: HTTP_INTERCEPTORS,
+    useFactory: function(router: Router) {
+      return new AuthInterceptor(router);
+    },
+    multi: true,
+    deps: [Router]
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
