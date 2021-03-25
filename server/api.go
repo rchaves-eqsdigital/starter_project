@@ -228,7 +228,19 @@ func apiSensorEdit(w http.ResponseWriter, r *http.Request, id int) {
 // apiUserEdit is the handler for `/api/v0/user/edit`.
 // It edits a user in the DB.
 func apiUserEdit(w http.ResponseWriter, r *http.Request, id int) {
-	log.Println(r.Header,r.PostForm,r.Form,r.Body)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	body, err := getPostBody(r)
+	if err != nil {
+		sendError(w, err)
+		return
+	}
+	log.Printf("[%s] received %s",r.URL.Path,body)
+	userID, _ := strconv.Atoi(body["id"])
+	err = a.UpdateUser(userID, body["data"])
+	if err != nil {
+		sendError(w, err)
+		return
+	}
 }
 
 // sendAsJson takes a val of any type, converts it to JSON and writes it to

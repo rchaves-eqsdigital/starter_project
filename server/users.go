@@ -8,6 +8,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"log"
 )
 
 type User struct {
@@ -137,6 +138,18 @@ func (a *App) DeleteUser(email string) error {
 
 	err = a.DB_u.Delete(&user, 1).Error
 	errs.F_err(err)
+	return nil
+}
+
+func (a *App) UpdateUser(id int, email string) error {
+	user := &User{}
+	err := a.DB_u.First(user, id).Error
+	if err != nil {
+		log.Println("couldn't find user with ID", id)
+		return err
+	}
+	user.Email = email
+	a.DB_u.Save(user)
 	return nil
 }
 
