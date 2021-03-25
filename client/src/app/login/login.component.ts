@@ -27,8 +27,6 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.girlScouts.deleteAll();
-    console.log("deleted");
-    this.girlScouts.set("fakeCookie","hello",1);
   }
 
   async onSubmit(): Promise<void> {
@@ -46,13 +44,12 @@ export class LoginComponent implements OnInit {
         document.getElementById("errorMsg").innerHTML = this.invalidString;
       } else {
         // Loading -> OK
-        let token = x.token;
         // Save token in cookie
-        this.girlScouts.set("token",token,{secure:true});
+        this.girlScouts.set("token",x.token);
         this.router.navigateByUrl("sensors");
       }
     }, (x) => {
       // Promise failed
-    }).then(x => this.apiService.getSensor("3"));
+    });
   }
 }

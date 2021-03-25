@@ -80,7 +80,7 @@ func apiLogin(w http.ResponseWriter, r *http.Request, id int) {
 	// TODO
 	// Test if is already logged in
 	// Token, session, etc.
-	token := "abc"
+	token := "valid"
 	ret := make(map[string]string)
 	ret["token"] = token
 	sendAsJson(w, ret)
@@ -298,6 +298,10 @@ func apiUserEdit(w http.ResponseWriter, r *http.Request, id int) {
 func auth(r *http.Request) error {
 	authorization := strings.Split(r.Header.Get("Authorization"), " ")
 	// method := authorization[0]
+	if len(authorization) < 2 {
+		// No token or empty string
+		return errors.New("Invalid token. Unauthorized")
+	}
 	tok := authorization[1]
 	if tok != "valid" {
 		return errors.New("Unauthorized")
