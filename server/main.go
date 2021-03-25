@@ -21,15 +21,17 @@ func (a *App) Init() error {
 		return err
 	}
 	// user@user.com, user
-	log.Println("[init] Creating default user...")
-	username := "user@user.com"
-	name := "Default User"
-	password := "user"
-	hash := sha256.Sum256([]byte(password))
-	a.hashCost = 15// 2s on a 9700k
-	err = a.CreateUser(username,name,hash[:])
-	errs.F_err(err)
-	log.Println("[init] User created.")
+	if users,_:=a.ListUsers(); len(users) == 0 {
+		log.Println("[init] Creating default user...")
+		username := "user@user.com"
+		name := "Default User"
+		password := "user"
+		hash := sha256.Sum256([]byte(password))
+		a.hashCost = 15// 2s on a 9700k
+		err = a.CreateUser(username,name,hash[:])
+		errs.F_err(err)
+		log.Println("[init] User created.")
+	}
 
 	err = a.InitSensorDB()
 	return err
