@@ -63,13 +63,7 @@ func apiLogin(w http.ResponseWriter, r *http.Request, id int) {
 	} else {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 	}
-	raw_body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		sendError(w, err)
-		return
-	}
-	var body map[string]string
-	err = json.Unmarshal(raw_body, &body)
+	body, err := getPostBody(r)
 	if err != nil {
 		sendError(w, err)
 		return
@@ -217,22 +211,17 @@ func apiUserAdd(w http.ResponseWriter, r *http.Request, id int) {
 // It edits a sensor in the DB.
 func apiSensorEdit(w http.ResponseWriter, r *http.Request, id int) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	raw_body, err := ioutil.ReadAll(r.Body)
+	body, err := getPostBody(r)
 	if err != nil {
-		log.Println("error in body",err.Error())
-		return
-	}
-	var body map[string]string
-	err = json.Unmarshal(raw_body, &body)
-	if err != nil {
-		log.Println("error decoding JSON", err.Error())
+		sendError(w, err)
 		return
 	}
 	log.Printf("[%s] received %s",r.URL.Path,body)
 	sensorID, _ := strconv.Atoi(body["id"])
 	err = a.UpdateSensor(sensorID, body["data"])
 	if err != nil {
-		log.Println("error updating sensor",err.Error())
+		sendError(w, err)
+		return
 	}
 }
 
@@ -254,7 +243,6 @@ func sendAsJson(w http.ResponseWriter, val interface{}) {
 
 // sendError responds to a request with error `err`.
 func sendError(w http.ResponseWriter, err error) {
-	w.Header().Set("Content-Type", "application/json")
 	ret := make(map[string]string)
 	ret["error"] = err.Error()
 	sendAsJson(w,ret)
@@ -262,18 +250,17 @@ func sendError(w http.ResponseWriter, err error) {
 
 // getPostBody takes a request, and if it is POST, returns a `map[string]string
 // of its body
-func getPostBody(r *http.Request) {
+func getPostBody(r *http.Request) (map[string]string, error){
 	raw_body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Println("error in body",err.Error())
-		return
+		return nil, err
 	}
 	var body map[string]string
 	err = json.Unmarshal(raw_body, &body)
 	if err != nil {
-		log.Println("error decoding JSON", err.Error())
-		return
+		return nil, err
 	}
+	return body, nil
 }
 
 /***************** REGEX *********************/
