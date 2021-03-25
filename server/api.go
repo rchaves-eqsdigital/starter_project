@@ -121,9 +121,13 @@ func apiSensor(w http.ResponseWriter, r *http.Request, id int) {
 				return
 			}
 		}
+		// Didn't find ID
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		http.NotFound(w,r)
+	} else {
+		log.Printf("[%s] returning %T of len %d",r.URL.Path,data,len(data))
+		sendAsJson(w,data)
 	}
-	log.Printf("[%s] returning %T of len %d",r.URL.Path,data,len(data))
-	sendAsJson(w,data)
 }
 
 // apiSensorData is the handler for `/api/v0/sensor/([0-9]+)/data/`.
@@ -177,9 +181,13 @@ func apiUser(w http.ResponseWriter, r *http.Request, id int) {
 				return
 			}
 		}
+		// Didn't find ID
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		http.NotFound(w,r)
+	} else {
+		log.Printf("[%s] returning %T of len %d",r.URL.Path,data,len(data))
+		sendAsJson(w,data)
 	}
-	log.Printf("[%s] returning %T of len %d",r.URL.Path,data,len(data))
-	sendAsJson(w,data)
 }
 
 // apiUserData is the handler for `/api/v0/user/([0-9]+)/data/`.

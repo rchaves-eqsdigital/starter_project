@@ -17,7 +17,13 @@ export class ItemDetailsComponent implements OnInit {
   constructor(private apiService: ApiService, private route: ActivatedRoute) { }
 
   async ngOnInit(): Promise<void> {
-    this.item = await this.getData();
+    this.getData().then(response => {
+      this.item = response;
+      console.log("response",response);
+    }).catch(e => {
+      let err = e.status+": "+e.statusText;
+      document.getElementById("error").innerHTML=err;
+    })
   }
 
   getType(): string {
