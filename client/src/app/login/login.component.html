@@ -1,11 +1,12 @@
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <div class="box">
         <h1>Login</h1>
+        <p id="errorMsg" class="error"></p>
         
         <input formControlName="email" value="email" class="email" />
         <input formControlName="password" type="password" value="pass" class="email" />
 
-        <button class="btn" type="submit">Sign In</button>
-        <a href="#"><div id="btn2">Sign Up</div></a>
+        <button class="btn" id="signIn">Sign In</button>
+        <button type="button" id="btn2">Sign Up</button>
     </div>
 </form>

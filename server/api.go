@@ -65,13 +65,13 @@ func apiLogin(w http.ResponseWriter, r *http.Request, id int) {
 	}
 	raw_body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Println("error in body",err.Error())
+		sendError(w, err)
 		return
 	}
 	var body map[string]string
 	err = json.Unmarshal(raw_body, &body)
 	if err != nil {
-		log.Println("error decoding JSON", err.Error())
+		sendError(w, err)
 		return
 	}
 	log.Printf("[%s] received %s",r.URL.Path,body["email"])
@@ -79,11 +79,18 @@ func apiLogin(w http.ResponseWriter, r *http.Request, id int) {
 	hash, err = hex.DecodeString(body["password"])
 	err = a.Login(body["email"], hash)
 	if err != nil {
-		log.Println(err.Error())
+		sendError(w, err)
 		return
 	}
+
 	log.Printf("[%s] %s logged in",r.URL.Path,body["email"])
-	// TODO: response
+	// TODO
+	// Test if is already logged in
+	// Token, session, etc.
+	token := "abc"
+	ret := make(map[string]string)
+	ret["token"] = token
+	sendAsJson(w, ret)
 }
 
 // apiLogout is the handler for `/api/v0/logout/`.
@@ -203,6 +210,14 @@ func sendAsJson(w http.ResponseWriter, val interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Write(ret)
+}
+
+// sendError responds to a request with error `err`.
+func sendError(w http.ResponseWriter, err error) {
+	w.Header().Set("Content-Type", "application/json")
+	ret := make(map[string]string)
+	ret["error"] = err.Error()
+	sendAsJson(w,ret)
 }
 
 // getPostBody takes a request, and if it is POST, returns a `map[string]string

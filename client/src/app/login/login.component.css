@@ -7,6 +7,12 @@
     border: var(--gray-2) 4px solid; 
 }
 
+.error {
+    color: var(--error-normal);
+    font-weight: bold;
+    font-size: 1em;
+}
+
 .email{
     background: var(--gray-1);
     border: var(--gray-2) 1px solid;
