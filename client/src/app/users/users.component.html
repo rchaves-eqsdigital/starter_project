@@ -1,7 +1,7 @@
 <app-top-nav></app-top-nav>
 
 <div class="content">
-    <app-item-list [items]="this.users" defaultIcon="fa-user"></app-item-list>
+    <app-item-list *ngIf="this.users" [items]="this.users" defaultIcon="fa-user"></app-item-list>
 </div>
 
 <app-float-button></app-float-button>

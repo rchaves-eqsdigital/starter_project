@@ -157,14 +157,46 @@ func apiSensorAdd(w http.ResponseWriter, r *http.Request, id int) {
 
 // apiUser is the handler for `/api/v0/user/`.
 // Returns a list with the existing users.
+// TODO: Users are being returned with the full struct. Take password out.
 func apiUser(w http.ResponseWriter, r *http.Request, id int) {
-
+	data, err := a.ListUsers()
+	errs.F_err(err)
+	keys, ok := r.URL.Query()["id"]
+	if ok {
+		// Asking for a single user with id in GET parameters
+		id, err = strconv.Atoi(keys[0])
+		if err != nil {
+			log.Println("error parsing GET[id]",err.Error()) //TODO: return error
+			return
+		}
+		// Search ID in data
+		for _, d := range data {
+			if int(d.ID) == id {
+				log.Printf("[%s] returning user with ID %d",r.URL.Path,id)
+				sendAsJson(w,d)
+				return
+			}
+		}
+	}
+	log.Printf("[%s] returning %T of len %d",r.URL.Path,data,len(data))
+	sendAsJson(w,data)
 }
 
 // apiUserData is the handler for `/api/v0/user/([0-9]+)/data/`.
 // Get user data.
 func apiUserData(w http.ResponseWriter, r *http.Request, id int) {
-	log.Println(r.URL.Path,id)
+	data, err := a.ListUsers()
+	errs.F_err(err)
+	// Search ID in data
+	for _, d := range data {
+		if int(d.ID) == id {
+			log.Printf("[%s] returning user with ID %d", r.URL.Path, id)
+			sendAsJson(w, d)
+			return
+		}
+	}
+	log.Printf("[%s] returning %T of len %d",r.URL.Path,data,len(data))
+	sendAsJson(w,data)
 }
 
 // apiUserAdd is the handler for `/api/v0/user/add`.

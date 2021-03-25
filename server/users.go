@@ -13,6 +13,7 @@ import (
 type User struct {
 	gorm.Model
 	Email    string
+	Name 	 string
 	Password []byte
 	Tok      string
 }
@@ -91,7 +92,7 @@ func (a *App) InitUserDB() error {
 }
 
 // Creates a new user/account
-func (a *App) CreateUser(email string, firstHash []byte) error {
+func (a *App) CreateUser(email string, name string, firstHash []byte) error {
 	// Generating a random salt isn't required, already handled by bcrypt
 	// Appending it to the base hash
 	var err error
@@ -101,7 +102,7 @@ func (a *App) CreateUser(email string, firstHash []byte) error {
 		return err
 	}
 	// Creating user in the DB
-	err = a.DB_u.Create(&User{Email: email, Password: hash}).Error
+	err = a.DB_u.Create(&User{Email: email, Password: hash, Name: name}).Error
 	if err != nil {
 		return err
 	}
@@ -118,6 +119,15 @@ func (a *App) ListUsersEmail(email string) ([]User, error) {
 	var users []User
 	err := a.DB_u.Where("Email = ?", email).Find(&users).Error
 	return users, err
+}
+
+func (a *App) ExistsUser(id int) (bool, *User) {
+	user := &User{}
+	err := a.DB_u.First(user, id).Error
+	if err != nil {
+		return false, nil
+	}
+	return true, user
 }
 
 func (a *App) DeleteUser(email string) error {

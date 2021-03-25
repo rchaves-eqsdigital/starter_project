@@ -6,6 +6,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Logging } from './logging';
 import { Sensor } from './sensors/sensor';
+import { User } from './users/user';
 
 @Injectable({
   providedIn: 'root'
@@ -47,6 +48,26 @@ export class ApiService {
     const data = await this.http.get<any>(url).toPromise()
     let ret = new Sensor(null,data.ID,data.RoomID);
     if (!environment.production) { Logging.log("[getSensor] Got item: "+ret); }
+    return ret;
+  }
+
+  // []User, users.go
+  getUsers(): Observable<any[]> {
+    let url: string = this.apiURL+"user";
+    if (!environment.production) { Logging.log(url); }
+    return this.http.get<any[]>(url)
+      .pipe(
+        catchError(this.handleError<any[]>('getUsers',[]))
+      );
+  }
+
+  // User, users.go
+  async getUser(id: string): Promise<any> {
+    let url: string = this.apiURL+"user?id="+id;
+    if (!environment.production) { Logging.log(url); }
+    const data = await this.http.get<any>(url).toPromise()
+    let ret = new User(null,data.Name,data.Email,id);
+    if (!environment.production) { Logging.log("[getUser] Got item: "+ret); }
     return ret;
   }
 

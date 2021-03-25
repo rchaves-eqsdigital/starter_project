@@ -39,7 +39,11 @@ export class ItemDetailsComponent implements OnInit {
   }
 
   private getData(): Promise<Item> {
-    return this.apiService.getSensor(this.getID());
+    if (this.getType() == "sensor") {
+      return this.apiService.getSensor(this.getID());
+    } else if (this.getType() == "user") {
+      return this.apiService.getUser(this.getID());
+    }
   }
 
 }

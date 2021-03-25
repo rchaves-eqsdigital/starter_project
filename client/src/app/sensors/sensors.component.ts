@@ -24,7 +24,6 @@ export class SensorsComponent implements OnInit {
         .subscribe((data) => {
           if (!environment.production) { Logging.log("[sensors] Got data with len "+data.length); }
           for (let i = 0; i < data.length; i++) {
-            const e = data[i];
             data[i] = new Sensor(null,data[i].ID,data[i].RoomID);
           }
           this.sensors = data;
