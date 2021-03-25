@@ -20,19 +20,19 @@ import (
 type Sensor struct {
 	gorm.Model
 	RoomID string
-	data []DataEntry
+	data   []DataEntry
 }
 
 type DataEntry struct {
 	gorm.Model
 	SensorID uint
-	Date   time.Time
-	Temp   int
-	InOut     string // "In", "Out"
+	Date     time.Time
+	Temp     int
+	InOut    string // "In", "Out"
 }
 
 func (s Sensor) String() string {
-	return fmt.Sprintf("%s, %d entries",s.RoomID,len(s.data))
+	return fmt.Sprintf("%s, %d entries", s.RoomID, len(s.data))
 }
 
 func (d DataEntry) String() string {
@@ -57,7 +57,7 @@ func (a *App) InitSensorDB() error {
 	err = a.DB_s.Exec("PRAGMA journal_mode=WAL;").Error
 	errs.F_err(err)
 
-	err = a.DB_s.AutoMigrate(&DataEntry{},&Sensor{})
+	err = a.DB_s.AutoMigrate(&DataEntry{}, &Sensor{})
 	errs.F_err(err)
 
 	// Checking if DB is empty
@@ -83,11 +83,11 @@ func (a *App) loadDataset() {
 	const buffer_max_size = 1024
 	const workers = 4
 	lines := make([]DataEntry, buffer_max_size)
-	log.Printf("Loading dataset using %d bytes buffers and %d workers.",buffer_max_size,workers)
+	log.Printf("Loading dataset using %d bytes buffers and %d workers.", buffer_max_size, workers)
 	jobs := make(chan []DataEntry)
 	done := make(chan int)
-	for w := 1; w <= workers; w++{
-		go workerThread(a,w,jobs,done)
+	for w := 1; w <= workers; w++ {
+		go workerThread(a, w, jobs, done)
 	}
 
 	scanner := bufio.NewScanner(file)
@@ -121,9 +121,9 @@ func (a *App) loadDataset() {
 				}
 			case 4:
 				d.InOut = v
-				d.SensorID = s.ID;
+				d.SensorID = s.ID
 				// Last field, DataEntry ready.
-				lines = append(lines,d)
+				lines = append(lines, d)
 				if len(lines) == cap(lines) {
 					// Flush data entries to workers
 					jobs <- lines
@@ -186,41 +186,7 @@ func (a *App) ListSensors() ([]Sensor, error) {
 
 func (a *App) ListDataEntries(s *Sensor) ([]DataEntry, error) {
 
-	s.data = make([]DataEntry,0)
-	/* // Showing tables
-	rows, _ := a.DB_s.Table("sqlite_master").
-		Where("type = ?","table").
-		Select("name").Rows()
-	for rows.Next() {
-		var name string
-		err := rows.Scan(&name)
-		errs.F_err(err)
-		log.Println("Table",name)
-	}
-	 */
-	/*
-	rows, _ := a.DB_s.Table("data_entries").
-		Select("id,sensor_id,date,temp,in_out").Rows()
-	for rows.Next() {
-		var id int
-		var sensorID uint
-		var date time.Time
-		var temp int
-		var in string
-		err := rows.Scan(&id,&sensorID,&date,&temp,&in)
-		errs.F_err(err)
-		log.Println(id,sensorID,date,temp,in)
-	}
-	rows, _ = a.DB_s.Table("sensors").
-		Select("id,room_id").Rows()
-	for rows.Next() {
-		var id int
-		var roomid string
-		err := rows.Scan(&id,&roomid)
-		errs.F_err(err)
-		log.Println(id,roomid)
-	}
-	 */
+	s.data = make([]DataEntry, 0)
 	rows, err := a.DB_s.Table("sensors").Where("sensors.id = ?", s.ID).
 		Joins("Join data_entries on data_entries.sensor_id = sensors.id").
 		Select("data_entries.sensor_id, data_entries.date, data_entries.temp, data_entries.in_out").
@@ -228,9 +194,9 @@ func (a *App) ListDataEntries(s *Sensor) ([]DataEntry, error) {
 	errs.F_err(err)
 	for rows.Next() {
 		var dataEntry DataEntry
-		err = rows.Scan(&dataEntry.SensorID,&dataEntry.Date,&dataEntry.Temp,&dataEntry.InOut)
+		err = rows.Scan(&dataEntry.SensorID, &dataEntry.Date, &dataEntry.Temp, &dataEntry.InOut)
 		errs.F_err(err)
-		s.data = append(s.data,dataEntry)
+		s.data = append(s.data, dataEntry)
 	}
 	return s.data, nil
 }

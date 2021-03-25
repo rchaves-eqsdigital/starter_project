@@ -52,22 +52,24 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 	case match(p, "/api/v0/user/edit"):
 		handler = apiUserEdit
 	default:
-		http.NotFound(w,r)
+		http.NotFound(w, r)
 		return
 	}
-	handler(w,r,id)
+	handler(w, r, id)
 }
 
 // apiLogin is the handler for `/api/v0/login/`.
 func apiLogin(w http.ResponseWriter, r *http.Request, id int) {
 	enableCors(&w)
-	if r.Method == "OPTIONS" { return }
+	if r.Method == "OPTIONS" {
+		return
+	}
 	body, err := getPostBody(r)
 	if err != nil {
 		sendError(w, err)
 		return
 	}
-	log.Printf("[%s] received %s",r.URL.Path,body["email"])
+	log.Printf("[%s] received %s", r.URL.Path, body["email"])
 	var hash []byte
 	hash, err = hex.DecodeString(body["password"])
 	err = a.Login(body["email"], hash)
@@ -76,7 +78,7 @@ func apiLogin(w http.ResponseWriter, r *http.Request, id int) {
 		return
 	}
 
-	log.Printf("[%s] %s logged in",r.URL.Path,body["email"])
+	log.Printf("[%s] %s logged in", r.URL.Path, body["email"])
 	// TODO
 	// Test if is already logged in
 	// Token, session, etc.
@@ -89,9 +91,11 @@ func apiLogin(w http.ResponseWriter, r *http.Request, id int) {
 // apiLogout is the handler for `/api/v0/logout/`.
 func apiLogout(w http.ResponseWriter, r *http.Request, id int) {
 	enableCors(&w)
-	if r.Method == "OPTIONS" { return }
+	if r.Method == "OPTIONS" {
+		return
+	}
 	if err := auth(r); err != nil {
-		http.Error(w,"Unauthorized",http.StatusUnauthorized)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 }
@@ -102,9 +106,11 @@ func apiLogout(w http.ResponseWriter, r *http.Request, id int) {
 // sensor with that ID.
 func apiSensor(w http.ResponseWriter, r *http.Request, id int) {
 	enableCors(&w)
-	if r.Method == "OPTIONS" { return }
+	if r.Method == "OPTIONS" {
+		return
+	}
 	if err := auth(r); err != nil {
-		http.Error(w,"",http.StatusUnauthorized)
+		http.Error(w, "", http.StatusUnauthorized)
 		return
 	}
 	data, err := a.ListSensors()
@@ -114,22 +120,22 @@ func apiSensor(w http.ResponseWriter, r *http.Request, id int) {
 		// Asking for a single sensor with id in GET parameters
 		id, err = strconv.Atoi(keys[0])
 		if err != nil {
-			log.Println("error parsing GET[id]",err.Error()) //TODO: return error
+			log.Println("error parsing GET[id]", err.Error()) //TODO: return error
 			return
 		}
 		// Search ID in data
 		for _, d := range data {
 			if int(d.ID) == id {
-				log.Printf("[%s] returning sensor with ID %d",r.URL.Path,id)
-				sendAsJson(w,d)
+				log.Printf("[%s] returning sensor with ID %d", r.URL.Path, id)
+				sendAsJson(w, d)
 				return
 			}
 		}
 		// Didn't find ID
-		http.NotFound(w,r)
+		http.NotFound(w, r)
 	} else {
-		log.Printf("[%s] returning %T of len %d",r.URL.Path,data,len(data))
-		sendAsJson(w,data)
+		log.Printf("[%s] returning %T of len %d", r.URL.Path, data, len(data))
+		sendAsJson(w, data)
 	}
 }
 
@@ -138,21 +144,23 @@ func apiSensor(w http.ResponseWriter, r *http.Request, id int) {
 // TODO: don't return everything at once, implement chunked requests
 func apiSensorData(w http.ResponseWriter, r *http.Request, id int) {
 	enableCors(&w)
-	if r.Method == "OPTIONS" { return }
+	if r.Method == "OPTIONS" {
+		return
+	}
 	if err := auth(r); err != nil {
-		http.Error(w,"Unauthorized",http.StatusUnauthorized)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 	// Check if ID is valid
 	exists, s := a.ExistsSensor(id)
 	if !exists {
-		http.NotFound(w,r)
+		http.NotFound(w, r)
 		return
 	}
 	// Get data from DB
 	data, err := a.ListDataEntries(s) // []DataEntry
-	errs.F_err(err) //TODO: return error
-	log.Printf("[%s] returning %T of len %d",r.URL.Path,data,len(data))
+	errs.F_err(err)                   //TODO: return error
+	log.Printf("[%s] returning %T of len %d", r.URL.Path, data, len(data))
 	sendAsJson(w, data)
 }
 
@@ -160,21 +168,25 @@ func apiSensorData(w http.ResponseWriter, r *http.Request, id int) {
 // Add sensor data reading.
 func apiSensorDataAdd(w http.ResponseWriter, r *http.Request, id int) {
 	enableCors(&w)
-	if r.Method == "OPTIONS" { return }
-	if err := auth(r); err != nil {
-		http.Error(w,"Unauthorized",http.StatusUnauthorized)
+	if r.Method == "OPTIONS" {
 		return
 	}
-	log.Println(r.URL.Path,id)
+	if err := auth(r); err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	log.Println(r.URL.Path, id)
 }
 
 // apiSensor add is the handler for `/api/v0/sensor/add`.
 // Add new sensor.
 func apiSensorAdd(w http.ResponseWriter, r *http.Request, id int) {
 	enableCors(&w)
-	if r.Method == "OPTIONS" { return }
+	if r.Method == "OPTIONS" {
+		return
+	}
 	if err := auth(r); err != nil {
-		http.Error(w,"Unauthorized",http.StatusUnauthorized)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 }
@@ -184,9 +196,11 @@ func apiSensorAdd(w http.ResponseWriter, r *http.Request, id int) {
 // TODO: Users are being returned with the full struct. Take password out.
 func apiUser(w http.ResponseWriter, r *http.Request, id int) {
 	enableCors(&w)
-	if r.Method == "OPTIONS" { return }
+	if r.Method == "OPTIONS" {
+		return
+	}
 	if err := auth(r); err != nil {
-		http.Error(w,"Unauthorized",http.StatusUnauthorized)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 	data, err := a.ListUsersClean()
@@ -196,22 +210,22 @@ func apiUser(w http.ResponseWriter, r *http.Request, id int) {
 		// Asking for a single user with id in GET parameters
 		id, err = strconv.Atoi(keys[0])
 		if err != nil {
-			log.Println("error parsing GET[id]",err.Error()) //TODO: return error
+			log.Println("error parsing GET[id]", err.Error()) //TODO: return error
 			return
 		}
 		// Search ID in data
 		for _, d := range data {
 			if int(d.ID) == id {
-				log.Printf("[%s] returning user with ID %d",r.URL.Path,id)
-				sendAsJson(w,d)
+				log.Printf("[%s] returning user with ID %d", r.URL.Path, id)
+				sendAsJson(w, d)
 				return
 			}
 		}
 		// Didn't find ID
-		http.NotFound(w,r)
+		http.NotFound(w, r)
 	} else {
-		log.Printf("[%s] returning %T of len %d",r.URL.Path,data,len(data))
-		sendAsJson(w,data)
+		log.Printf("[%s] returning %T of len %d", r.URL.Path, data, len(data))
+		sendAsJson(w, data)
 	}
 }
 
@@ -219,9 +233,11 @@ func apiUser(w http.ResponseWriter, r *http.Request, id int) {
 // Get user data.
 func apiUserData(w http.ResponseWriter, r *http.Request, id int) {
 	enableCors(&w)
-	if r.Method == "OPTIONS" { return }
+	if r.Method == "OPTIONS" {
+		return
+	}
 	if err := auth(r); err != nil {
-		http.Error(w,"Unauthorized",http.StatusUnauthorized)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 	data, err := a.ListUsersClean()
@@ -234,17 +250,19 @@ func apiUserData(w http.ResponseWriter, r *http.Request, id int) {
 			return
 		}
 	}
-	log.Printf("[%s] returning %T of len %d",r.URL.Path,data,len(data))
-	sendAsJson(w,data)
+	log.Printf("[%s] returning %T of len %d", r.URL.Path, data, len(data))
+	sendAsJson(w, data)
 }
 
 // apiUserAdd is the handler for `/api/v0/user/add`.
 // Add user.
 func apiUserAdd(w http.ResponseWriter, r *http.Request, id int) {
 	enableCors(&w)
-	if r.Method == "OPTIONS" { return }
+	if r.Method == "OPTIONS" {
+		return
+	}
 	if err := auth(r); err != nil {
-		http.Error(w,"Unauthorized",http.StatusUnauthorized)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 }
@@ -253,9 +271,11 @@ func apiUserAdd(w http.ResponseWriter, r *http.Request, id int) {
 // It edits a sensor in the DB.
 func apiSensorEdit(w http.ResponseWriter, r *http.Request, id int) {
 	enableCors(&w)
-	if r.Method == "OPTIONS" { return }
+	if r.Method == "OPTIONS" {
+		return
+	}
 	if err := auth(r); err != nil {
-		http.Error(w,"Unauthorized",http.StatusUnauthorized)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 	body, err := getPostBody(r)
@@ -263,7 +283,7 @@ func apiSensorEdit(w http.ResponseWriter, r *http.Request, id int) {
 		sendError(w, err)
 		return
 	}
-	log.Printf("[%s] received %s",r.URL.Path,body)
+	log.Printf("[%s] received %s", r.URL.Path, body)
 	sensorID, _ := strconv.Atoi(body["id"])
 	err = a.UpdateSensor(sensorID, body["data"])
 	if err != nil {
@@ -276,9 +296,11 @@ func apiSensorEdit(w http.ResponseWriter, r *http.Request, id int) {
 // It edits a user in the DB.
 func apiUserEdit(w http.ResponseWriter, r *http.Request, id int) {
 	enableCors(&w)
-	if r.Method == "OPTIONS" { return }
+	if r.Method == "OPTIONS" {
+		return
+	}
 	if err := auth(r); err != nil {
-		http.Error(w,"Unauthorized",http.StatusUnauthorized)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 	body, err := getPostBody(r)
@@ -286,7 +308,7 @@ func apiUserEdit(w http.ResponseWriter, r *http.Request, id int) {
 		sendError(w, err)
 		return
 	}
-	log.Printf("[%s] received %s",r.URL.Path,body)
+	log.Printf("[%s] received %s", r.URL.Path, body)
 	userID, _ := strconv.Atoi(body["id"])
 	err = a.UpdateUser(userID, body["data"])
 	if err != nil {
@@ -321,7 +343,7 @@ func sendAsJson(w http.ResponseWriter, val interface{}) {
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, " +
+	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, "+
 		"Accept-Encoding, X-CSRF-Token, Authorization")
 }
 
@@ -329,12 +351,12 @@ func enableCors(w *http.ResponseWriter) {
 func sendError(w http.ResponseWriter, err error) {
 	ret := make(map[string]string)
 	ret["error"] = err.Error()
-	sendAsJson(w,ret)
+	sendAsJson(w, ret)
 }
 
 // getPostBody takes a request, and if it is POST, returns a `map[string]string
 // of its body
-func getPostBody(r *http.Request) (map[string]string, error){
+func getPostBody(r *http.Request) (map[string]string, error) {
 	raw_body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return nil, err
@@ -377,7 +399,7 @@ func match(path, pattern string, vars ...interface{}) bool {
 
 var (
 	regexen = make(map[string]*regexp.Regexp)
-	relock sync.Mutex
+	relock  sync.Mutex
 )
 
 // mustCompileCached is a concurrency-safe regex compiler, where regexes are

@@ -14,14 +14,14 @@ import (
 type User struct {
 	gorm.Model
 	Email    string
-	Name 	 string
+	Name     string
 	Password []byte
 	Tok      string
 }
 
 type Session struct {
 	gorm.Model
-	Email string
+	ID    uint
 	Tok   string
 	Valid bool
 }
@@ -43,11 +43,11 @@ func (a *App) Login(email string, hash []byte) error {
 		// User with the provided email doesn't exist.
 		// Spend time anyway, so a potential attacker doesn't know if it's
 		// wrong user, wrong password, or both.
-		bcrypt.GenerateFromPassword([]byte("nop"),a.hashCost)
+		bcrypt.GenerateFromPassword([]byte("nop"), a.hashCost)
 		return invalid
 	}
 	user := users[0]
-	err = bcrypt.CompareHashAndPassword(user.Password,hash)
+	err = bcrypt.CompareHashAndPassword(user.Password, hash)
 	if err != nil {
 		return invalid
 	}
@@ -98,7 +98,7 @@ func (a *App) CreateUser(email string, name string, firstHash []byte) error {
 	// Appending it to the base hash
 	var err error
 	var hash []byte
-	hash, err = bcrypt.GenerateFromPassword(firstHash,a.hashCost)
+	hash, err = bcrypt.GenerateFromPassword(firstHash, a.hashCost)
 	if err != nil {
 		return err
 	}
@@ -121,7 +121,7 @@ func (a *App) ListUsersClean() ([]User, error) {
 	if err != nil {
 		return nil, err
 	}
-	for i:=0; i<len(users); i++ {
+	for i := 0; i < len(users); i++ {
 		users[i].Password = nil
 		users[i].Tok = ""
 	}
@@ -139,7 +139,7 @@ func (a *App) ListUsersEmailClean(email string) ([]User, error) {
 	if err != nil {
 		return nil, err
 	}
-	for i:=0; i<len(users); i++ {
+	for i := 0; i < len(users); i++ {
 		users[i].Password = nil
 		users[i].Tok = ""
 	}
@@ -180,7 +180,7 @@ func (a *App) UpdateUser(id int, email string) error {
 // Takes session token, returns (Session,error)
 func (a *App) sessionGetTok(tok string) (*Session, error) {
 	var s *Session
-	err := a.DB_u.Where("Tok LIKE ?", fmt.Sprintf("%%%s%%",tok)).Find(s).Error
+	err := a.DB_u.Where("Tok LIKE ?", fmt.Sprintf("%%%s%%", tok)).Find(s).Error
 	return s, err
 }
 
@@ -188,11 +188,11 @@ func (a *App) sessionGetTok(tok string) (*Session, error) {
 func (a *App) sessionGetEmail(email string) (*Session, error) {
 	// First, get User
 	/*
-	var u *User
+		var u *User
 
-	var s *Session
-	err := a.DB_u.Where("")
-	 */
+		var s *Session
+		err := a.DB_u.Where("")
+	*/
 	return nil, nil
 }
 
@@ -206,25 +206,25 @@ func (a *App) sessionIsValid(tok string) error {
 
 func (a *App) newSession(email string, hash []byte) error {
 	/*
-	var users []User
-	var err error
-	users, err = a.ListUsers_email(email)
-	if err != nil {
-		return err
-	}
-	if len(users) == 0 {
-		return errors.New("couldn't find user")
-	}
-	if len(users) > 1 {
-		return errors.New("multiple results")
-	}
+		var users []User
+		var err error
+		users, err = a.ListUsers_email(email)
+		if err != nil {
+			return err
+		}
+		if len(users) == 0 {
+			return errors.New("couldn't find user")
+		}
+		if len(users) > 1 {
+			return errors.New("multiple results")
+		}
 
-	if bytes.Compare(users[0].Password, hash) == 0 {
-		a.DB_u.Create(&Session{U: user, Tok: uuid.UUID.String(uuid.New()), Valid: true})
-	} else {
-		return errors.New("invalid credentials")
-	}
+		if bytes.Compare(users[0].Password, hash) == 0 {
+			a.DB_u.Create(&Session{U: user, Tok: uuid.UUID.String(uuid.New()), Valid: true})
+		} else {
+			return errors.New("invalid credentials")
+		}
 
-	 */
+	*/
 	return nil
 }
