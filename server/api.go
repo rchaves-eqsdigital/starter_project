@@ -71,20 +71,21 @@ func apiLogin(w http.ResponseWriter, r *http.Request, id int) {
 	}
 	log.Printf("[%s] received %s", r.URL.Path, body["email"])
 	var hash []byte
+	var sessionToken string
 	hash, err = hex.DecodeString(body["password"])
-	err = a.Login(body["email"], hash)
+	if err != nil {
+		sendError(w, err)
+		return
+	}
+	sessionToken, err = a.Login(body["email"], hash)
 	if err != nil {
 		sendError(w, err)
 		return
 	}
 
 	log.Printf("[%s] %s logged in", r.URL.Path, body["email"])
-	// TODO
-	// Test if is already logged in
-	// Token, session, etc.
-	token := "valid"
 	ret := make(map[string]string)
-	ret["token"] = token
+	ret["token"] = sessionToken
 	sendAsJson(w, ret)
 }
 
@@ -99,8 +100,9 @@ func apiLogout(w http.ResponseWriter, r *http.Request, id int) {
 		return
 	}
 	log.Printf("[%s] logging out %s", r.URL.Path, body["token"])
+	err = a.Logout(body["token"])
 	ret := make(map[string]string)
-	ret["ok"] = "true"
+	ret["ok"] = strconv.FormatBool(err == nil)
 	sendAsJson(w, ret)
 }
 
@@ -300,7 +302,8 @@ func auth(r *http.Request) error {
 		return errors.New("Invalid token. Unauthorized")
 	}
 	tok := authorization[1]
-	if tok != "valid" {
+	_, err := a.getSessionFromTok(tok)
+	if err != nil {
 		return errors.New("Unauthorized")
 	}
 	return nil

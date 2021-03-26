@@ -3,7 +3,7 @@ package main
 import (
 	"./errs"
 	"errors"
-	"fmt"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -21,7 +21,7 @@ type User struct {
 
 type Session struct {
 	gorm.Model
-	ID    uint
+	UserID    uint
 	Tok   string
 	Valid bool
 }
@@ -30,52 +30,47 @@ func (u *User) String() string {
 	return u.Email + ":" + string(u.Password)
 }
 
-// LOGIN / LOGOUT? token, cookies, etc etc
-// - Sessão c/ UUID (guardar em BE dados como data de acesso, IP, etc.)
-func (a *App) Login(email string, hash []byte) error {
+// Login takes a users email and password, returning (sessionToken,error)
+func (a *App) Login(email string, hash []byte) (string, error) {
 	// Validate user
 	users, err := a.ListUsersEmail(email)
 	invalid := errors.New("invalid credentials")
 	if err != nil {
-		return err
+		return "", err
 	}
 	if len(users) == 0 {
 		// User with the provided email doesn't exist.
 		// Spend time anyway, so a potential attacker doesn't know if it's
 		// wrong user, wrong password, or both.
 		bcrypt.GenerateFromPassword([]byte("nop"), a.hashCost)
-		return invalid
+		return "", invalid
 	}
 	user := users[0]
 	err = bcrypt.CompareHashAndPassword(user.Password, hash)
 	if err != nil {
-		return invalid
+		return "", invalid
 	}
 	// Check if user already has an active session
-	_, err = a.sessionGetEmail(email)
-	if err != nil {
-		return err // user already logged in
+	var s *Session
+	uid := int(user.ID)
+	s, err = a.getSessionFromUser(uid)
+	if s != nil {
+		return "", errors.New("user already logged in")
 	}
-
-	err = a.newSession(email, hash)
-	if err != nil {
-		return err // invalid email/password
-	}
-	return nil
+	var tok string
+	tok, err = a.CreateSession(uid)
+	return tok, err
 }
 
-// Logs out and invalidates session
-func (a *App) Logout(email string) error {
+// Logout takes a token and invalidates it, effectively logging a user out
+func (a *App) Logout(tok string) error {
 	// Check if user is logged in
-	session, err := a.sessionGetEmail(email)
+	_, err := a.getSessionFromTok(tok)
 	if err != nil {
 		return err
 	}
-	err = a.sessionInvalidate(session.Tok)
-	if err != nil {
-		return err // user not logged in
-	}
-	return nil
+	err = a.InvalidateSession(tok)
+	return err
 }
 
 /////////////////////////////////////////////////
@@ -104,10 +99,7 @@ func (a *App) CreateUser(email string, name string, firstHash []byte) error {
 	}
 	// Creating user in the DB
 	err = a.DB_u.Create(&User{Email: email, Password: hash, Name: name}).Error
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (a *App) ListUsers() ([]User, error) {
@@ -177,54 +169,82 @@ func (a *App) UpdateUser(id int, email string) error {
 	return nil
 }
 
-// Takes session token, returns (Session,error)
-func (a *App) sessionGetTok(tok string) (*Session, error) {
+// getSessionFromTok takes session token, returns (Session,error)
+func (a *App) getSessionFromTok(tok string) (*Session, error) {
 	var s *Session
-	err := a.DB_u.Where("Tok LIKE ?", fmt.Sprintf("%%%s%%", tok)).Find(s).Error
+	err := a.DB_u.Where("Tok = ?", tok).First(&s).Error
 	return s, err
 }
 
-// Takes user's email, returns (Session,error)
-func (a *App) sessionGetEmail(email string) (*Session, error) {
+// getSessionFromUser takes user's ID, returns (Session,error)
+func (a *App) getSessionFromUser(userID int) (*Session, error) {
 	// First, get User
-	/*
-		var u *User
-
-		var s *Session
-		err := a.DB_u.Where("")
-	*/
-	return nil, nil
+	ok, u := a.ExistsUser(userID)
+	if !ok {
+		return nil, errors.New("invalid userID "+string(userID))
+	}
+	s, err := a.getSessionFromTok(u.Tok)
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
 }
 
-func (a *App) sessionInvalidate(tok string) error {
-	return nil
+func (a *App) getUserFromSession(tok string) (*User, error) {
+	s, err := a.getSessionFromTok(tok)
+	if err != nil {
+		return nil, err
+	}
+	var user *User
+	err = a.DB_u.Where("ID = ?", s.UserID).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return user, err
 }
 
-func (a *App) sessionIsValid(tok string) error {
-	return nil
+func (a *App) InvalidateSession(tok string) error {
+	s, err := a.getSessionFromTok(tok)
+	if err != nil {
+		return err
+	}
+	var user *User
+	user, err = a.getUserFromSession(tok)
+	if err != nil {
+		return err
+	}
+	s.Valid = false
+	err = a.DB_u.Save(s).Error
+	if err != nil {
+		// I assume we don't have to set s.Valid back to true, as the DB save failed
+		return err
+	}
+	user.Tok = ""
+	err = a.DB_u.Save(user).Error
+	// Same comment as above
+	return err
 }
 
-func (a *App) newSession(email string, hash []byte) error {
-	/*
-		var users []User
-		var err error
-		users, err = a.ListUsers_email(email)
-		if err != nil {
-			return err
-		}
-		if len(users) == 0 {
-			return errors.New("couldn't find user")
-		}
-		if len(users) > 1 {
-			return errors.New("multiple results")
-		}
+// TestSession returns true if the session represented by `tok` is valid/exists
+func (a *App) TestSession(tok string) bool {
+	_, err := a.getSessionFromTok(tok)
+	return err == nil
+}
 
-		if bytes.Compare(users[0].Password, hash) == 0 {
-			a.DB_u.Create(&Session{U: user, Tok: uuid.UUID.String(uuid.New()), Valid: true})
-		} else {
-			return errors.New("invalid credentials")
-		}
-
-	*/
-	return nil
+func (a *App) CreateSession(userID int) (string, error) {
+	ok, u := a.ExistsUser(userID)
+	if !ok {
+		return "", errors.New("invalid userID "+string(userID))
+	}
+	// Generate a new token
+	tok := uuid.UUID.String(uuid.New())
+	session := &Session{UserID: u.ID, Tok: tok, Valid: true}
+	err := a.DB_u.Create(session).Error
+	if err != nil {
+		return "", err
+	}
+	// Save the token in the affected user
+	u.Tok = tok
+	err = a.DB_u.Save(u).Error
+	return tok, err
 }

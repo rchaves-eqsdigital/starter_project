@@ -33,9 +33,9 @@ export class TopNavComponent implements OnInit {
   }
 
   public logout(): void {
-    // Assure there is a token to log out of
+    // Assure that there is a token to log out of
     if (this.girlScouts.get("token") == "") {
-      return null;
+      return;
     }
     this.apiService.logout().then((x) => {
       if (x.error || x.ok != "true") {
