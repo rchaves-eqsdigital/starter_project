@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SHA256 } from 'crypto-js';
-import { ApiService } from '../api.service';
+import { ApiService } from '../../api.service';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { ApiService } from '../api.service';
-import { Logging } from '../logging/logging';
-import { Sensor } from '../data-structs/sensor';
+import { ApiService } from '../../api.service';
+import { Logging } from '../../logging/logging';
+import { Sensor } from '../../data-structs/sensor';
 
 @Component({
   selector: 'app-sensors',

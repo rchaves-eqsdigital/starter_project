@@ -1,6 +1,6 @@
 import { Component, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
-import { ApiService } from '../api.service';
-import { Item } from '../data-structs/item';
+import { ApiService } from '../../api.service';
+import { Item } from '../../data-structs/item';
 
 @Component({
   selector: 'app-item-form',

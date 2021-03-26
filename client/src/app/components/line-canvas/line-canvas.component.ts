@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, ViewChild, OnInit, OnChanges } from '@angular/core';
-import { Logging } from '../logging/logging';
+import { Logging } from '../../logging/logging';
 
 @Component({
   selector: 'app-line-canvas',

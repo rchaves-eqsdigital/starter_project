@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild, ElementRef, OnInit, OnChanges } from '@angular/core';
 import * as chart from 'chart.js';
 import { environment } from 'src/environments/environment';
-import { Logging } from '../logging/logging';
+import { Logging } from '../../logging/logging';
 
 @Component({
   selector: 'app-line-chartjs',

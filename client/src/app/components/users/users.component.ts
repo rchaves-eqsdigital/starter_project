@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { ApiService } from '../api.service';
-import { Logging } from '../logging/logging';
-import { User } from '../data-structs/user';
+import { ApiService } from '../../api.service';
+import { Logging } from '../../logging/logging';
+import { User } from '../../data-structs/user';
 
 @Component({
   selector: 'app-users',

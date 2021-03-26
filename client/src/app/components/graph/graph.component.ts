@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
-import { ApiService } from '../api.service';
-import { DataEntry } from '../data-structs/data-entry';
-import { Logging } from '../logging/logging';
+import { ApiService } from '../../api.service';
+import { DataEntry } from '../../data-structs/data-entry';
+import { Logging } from '../../logging/logging';
 
 @Component({
   selector: 'app-graph',

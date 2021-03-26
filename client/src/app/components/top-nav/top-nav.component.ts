@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from 'src/environments/environment';
-import { ApiService } from '../api.service';
+import { ApiService } from '../../api.service';
 
 @Component({
   selector: 'app-top-nav',
