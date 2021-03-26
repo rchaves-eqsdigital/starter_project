@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"gorm.io/gorm"
 	"log"
+	"strings"
 )
 
 type App struct {
@@ -22,19 +23,32 @@ func (a *App) Init() error {
 	}
 	// user@user.com, user
 	if users, _ := a.ListUsers(); len(users) == 0 {
-		log.Println("[init] Creating default user...")
-		username := "user@user.com"
-		name := "Default User"
-		password := "user"
-		hash := sha256.Sum256([]byte(password))
-		a.hashCost = 15 // 2s on a 9700k
-		err = a.CreateUser(username, name, hash[:])
-		errs.F_err(err)
-		log.Println("[init] User created.")
+		emails := []string{"user@user.com","user1@user.com","alice@user.com",
+			"bob@user.com","user2@user.com","user3@user.com","user4@user.com"}
+		passwords := []string{"user","user","user","user","user","user","user"}
+		createDefaultUsers(emails,passwords)
 	}
 
 	err = a.InitSensorDB()
 	return err
+}
+
+func createDefaultUsers(emails []string, passwords []string) {
+	if len(emails) != len(passwords) {
+		log.Println("[init] Error: Emails and Passwords don't have the same size.")
+		return
+	}
+	for i:=0; i < len(emails); i++ {
+		email := emails[i]
+		pass := passwords[i]
+		log.Println("[init] Creating user",email)
+		name := "default " + strings.Split(email,"@")[0]
+		hash := sha256.Sum256([]byte(pass))
+		a.hashCost = 14 // 1s on a 9700k
+		err := a.CreateUser(email, name, hash[:])
+		errs.F_err(err)
+		log.Println("[init] Created user",email)
+	}
 }
 
 func main() {

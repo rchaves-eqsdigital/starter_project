@@ -3,7 +3,14 @@ This is a tutorial project, created to learn **Go** (server) and **Angular/Types
 
 There are editable users and sensors, displayed in the app. Sensors have data, imported from a real dataset, shown in 3 types of line charts: [ChartJS](https://www.chartjs.org/), [ECharts](https://echarts.apache.org/en/index.html) and drawn directly on the canvas.
 
-A live online version of this project is available [here](http://eqs.ricardochaves.pt). Credentials for the default user are `user@user.com user`.
+A live online version of this project is available [here](http://eqs.ricardochaves.pt). There are several default users: if you can't log in with any of them, it means someone else is already logged in with it (please log out after you're done). Please choose a different one (password is `user`):
+- `user@user.com`
+- `user1@user.com`
+- `alice@user.com`
+- `bob@user.com`
+- `user2@user.com`
+- `user3@user.com`
+- `user4@user.com`
 
 A list of the available API endpoints are available at the start of the [api file](server/api.go).
 
