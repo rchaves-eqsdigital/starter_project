@@ -12,7 +12,7 @@ This project was only tested in Firefox.
 ----------
 ## Setting up locally
 ### Client
-Angular 11.2.3 was used.
+Angular 11.2.3 and npm 6.14.11 (v14.16.0) were used.
 In the `client/` directory:
 ```
 npm install
@@ -22,6 +22,7 @@ ng serve
 Go 1.15.1 was used.
 In the repo's root directory:
 ```
+cd server && go get -d ./... # deps
 make clean && make && bin/server
 ```
 
