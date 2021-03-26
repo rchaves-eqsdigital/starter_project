@@ -4,8 +4,11 @@ import { Router } from "@angular/router";
 import { Observable, of, throwError } from "rxjs";
 import { catchError } from "rxjs/operators";
 
-// Source: https://stackoverflow.com/questions/46017245/how-to-handle-unauthorized-requestsstatus-with-401-or-403-with-new-httpclient
-
+/**
+ * HTTP errors 401 and 403 interceptor, routing to /login when they occur.
+ * 
+ * Heavily based off stackoverflow, https://stackoverflow.com/questions/46017245/how-to-handle-unauthorized-requestsstatus-with-401-or-403-with-new-httpclient
+ */
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
     constructor(private router: Router) { }

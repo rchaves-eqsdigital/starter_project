@@ -4,6 +4,9 @@ import { CookieService } from 'ngx-cookie-service';
 import { environment } from 'src/environments/environment';
 import { ApiService } from '../../api.service';
 
+/**
+ * Top nav-bar, with dark mode switch, user and logout.
+ */
 @Component({
   selector: 'app-top-nav',
   templateUrl: './top-nav.component.html',
@@ -11,18 +14,30 @@ import { ApiService } from '../../api.service';
 })
 export class TopNavComponent implements OnInit {
 
+  /**
+   * Boolean with the toggle-button state.
+   */
   private toggled: boolean = false;
 
+  /**
+   * If `back` is not null, a back arrow is displayed, routing to `back`
+   * when clicked.
+   */
   @Input()
   back: String;
 
   constructor(
     private apiService: ApiService,
     private girlScouts: CookieService,
-    private router: Router) { }
+    private router: Router
+  ) { }
 
   ngOnInit(): void { }
 
+  /**
+   * Toggle between dark and light mode, analogous to an IRL
+   * light switch flip.
+   */
   public switchLights(): void {
     if (this.toggled) {
       this.setLight();
@@ -32,6 +47,9 @@ export class TopNavComponent implements OnInit {
     this.toggled = !this.toggled;
   }
 
+  /**
+   * Logout, called when the logout icon is clicked.
+   */
   public logout(): void {
     // Assure that there is a token to log out of
     if (this.girlScouts.get("token") == "") {
@@ -51,11 +69,17 @@ export class TopNavComponent implements OnInit {
     });
   }
 
+  /**
+   * Change dark mode to light.
+   */
   private setLight(): void {
     document.body.classList.toggle('dark',false);
     document.body.classList.toggle('light',true);
   }
 
+  /**
+   * Change light mode to dark.
+   */
   private setDark(): void {
     document.body.classList.toggle('light',false);
     document.body.classList.toggle('dark',true);

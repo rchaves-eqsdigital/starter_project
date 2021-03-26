@@ -1,9 +1,20 @@
+/**
+ * Custom Logging class, providing a Logging.log(s) that prepends the caller function
+ * name to `s`.
+ */
 export class Logging {
+    /**
+     * Wrapper for console.log, prepending the caller function name.
+     * @param s - string to be logged.
+     */
     static log(s: any): void {
         let caller = this.getParent();
         console.log(`[${caller}] ${s}`)
     }
 
+    /**
+     * @returns name of the calling function.
+     */
     private static getParent(): string {
       try {
         throw new Error();

@@ -3,6 +3,9 @@ import * as chart from 'chart.js';
 import { environment } from 'src/environments/environment';
 import { Logging } from '../../logging/logging';
 
+/**
+ * Component to draw a line chart using ChartJS.
+ */
 @Component({
   selector: 'app-line-chartjs',
   templateUrl: './line-chartjs.component.html',
@@ -10,13 +13,22 @@ import { Logging } from '../../logging/logging';
 })
 export class LineChartjsComponent implements OnInit, OnChanges {
 
+  /**
+   * Canvas element.
+   */
   @ViewChild('canvas', {static: true})
   public canvas: ElementRef;
 
+  /**
+   * ChartJS variables.
+   */
   public context: CanvasRenderingContext2D = null;
   public chart: chart.Chart = null;
   public dataset: chart.ChartData = null;
 
+  /**
+   * Data to be drawn.
+   */
   @Input()
   data: {x:number[],y:number[]};
 
@@ -28,10 +40,17 @@ export class LineChartjsComponent implements OnInit, OnChanges {
     }
   }
 
+  /**
+   * If something changes, the chart is updated.
+   */
   ngOnChanges(): void {
     this.chartjsUpdate();
   }
 
+  /**
+   * Initialization of ChartJS. Chart color is set to `--brand-normal` and a 
+   * responsive line chart is created. Linear scales.
+   */
   private chartjsInit(): void {
     const color: string = getComputedStyle(document.querySelector('body')).getPropertyValue('--brand-normal');
     this.dataset = {
@@ -82,6 +101,9 @@ export class LineChartjsComponent implements OnInit, OnChanges {
 		});
   }
 
+  /**
+   * Update the dataset if required, updating the chart afterwards.
+   */
   private chartjsUpdate(): void {
     this.ngOnInit(); // Initialize if needed
     for (let i = 0; i < this.data.x.length; i++) { // WIP: Duct tape ^
@@ -91,6 +113,14 @@ export class LineChartjsComponent implements OnInit, OnChanges {
     this.chart.update();
   }
 
+  /**
+   * Auxiliary function to convert x[],y[] to a {x, y}[] format,
+   * as required by ChartJS.
+   * 
+   * @param x_arr - Array with the X data.
+   * @param y_arr - Array with the Y data.
+   * @returns - Data in the new format.
+   */
   private rollUp(x_arr: number[], y_arr: number[]): {x: any, y: any}[] {
     let ret = [];
     if (x_arr.length != y_arr.length) {

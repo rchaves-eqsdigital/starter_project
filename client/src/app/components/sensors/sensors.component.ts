@@ -4,6 +4,9 @@ import { ApiService } from '../../api.service';
 import { Logging } from '../../logging/logging';
 import { Sensor } from '../../data-structs/sensor';
 
+/**
+ * Component shown in /sensors, shows a list of sensors.
+ */
 @Component({
   selector: 'app-sensors',
   templateUrl: './sensors.component.html',
@@ -11,6 +14,9 @@ import { Sensor } from '../../data-structs/sensor';
 })
 export class SensorsComponent implements OnInit {
 
+  /**
+   * Array of sensors, to be populated by this.getData().
+   */
   sensors: Sensor[] = [];
 
   constructor(private apiService: ApiService) { }
@@ -19,6 +25,9 @@ export class SensorsComponent implements OnInit {
     this.getData();
   }
 
+  /**
+   * Fetches the list of sensors from the API, saving it in `this.sensors`.
+   */
   getData(): void {
     this.apiService.getSensors()
         .subscribe((data) => {

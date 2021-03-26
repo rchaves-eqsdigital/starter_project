@@ -1,6 +1,8 @@
 import { Component, ElementRef, Input, ViewChild, OnInit, OnChanges } from '@angular/core';
-import { Logging } from '../../logging/logging';
 
+/**
+ * Component to draw a line chart using only the canvas.
+ */
 @Component({
   selector: 'app-line-canvas',
   templateUrl: './line-canvas.component.html',
@@ -8,15 +10,25 @@ import { Logging } from '../../logging/logging';
 })
 export class LineCanvasComponent implements OnInit, OnChanges {
 
+  /**
+   * Data to be drawn.
+   */
   @Input()
   data: {x:number[],y:number[]}; // TODO: Data is already in the right format thanks to `line-chartjs.component.ts`
 
+  /**
+   * Canvas element.
+   */
   @ViewChild('canvas', {static: true})
   private canvas: ElementRef;
 
-  // "normal" coordinates, (0,0) at bottom left, y' positive up, x' positive right
+  /**
+   * "Normal" coordinates, (0,0) at bottom left, y' positive up, x' positive right
+   */
   private pos: {x:number,y:number} = {x:0,y:0};
-  // real pos
+  /**
+   * Real canvas coordinates.
+   */
   private pos_r: {x:number,y:number} = {x:0,y:0};
 
   /* ANIMATION */
@@ -41,6 +53,9 @@ export class LineCanvasComponent implements OnInit, OnChanges {
     }
   }
 
+  /**
+   * Get canvas context, prepare everything for drawing and start the draw animation.
+   */
   private canvasRun(): void {
     let canvas = this.canvas.nativeElement;
     let ctx = this.setupCanvas(canvas);
@@ -69,6 +84,16 @@ export class LineCanvasComponent implements OnInit, OnChanges {
     }.bind(this));
   }
 
+  /**
+   * Initializes `this.pos` and `this.pos_r`, sets line color to `--brand-normal`
+   * and moves the draw-cursor to the origin.
+   * 
+   * @param ctx - Canvas context.
+   * @param c_x - Canvas width.
+   * @param c_y - Canvas height.
+   * @param x_off - Optional chart offset on 0x.
+   * @param y_off - Optional chart offset on 0y.
+   */
   private c_init(ctx: CanvasRenderingContext2D, c_x: number, c_y: number, x_off: number=0, y_off: number=0): void {
     this.pos.x = 0;
     this.pos.y = 0;
@@ -80,6 +105,13 @@ export class LineCanvasComponent implements OnInit, OnChanges {
     ctx.moveTo(this.pos_r.x, this.pos_r.y);
   }
 
+  /**
+   * Draw the chart's background grid.
+   * 
+   * @param ctx - Canvas context.
+   * @param canvas_w - Canvas width.
+   * @param canvas_h - Canvas height.
+   */
   private drawGrid(ctx: CanvasRenderingContext2D, canvas_w: number, canvas_h: number): void {
     ctx.closePath();
     ctx.save();
@@ -108,7 +140,13 @@ export class LineCanvasComponent implements OnInit, OnChanges {
     ctx.beginPath();
   }
 
-  // Draws line on `ctx` starting from the current position
+  /**
+   * Draw line on `ctx` starting from the current position.
+   * 
+   * @param ctx - Canvas context.
+   * @param x - draw to here.
+   * @param y - draw to here.
+   */
   private line(ctx: CanvasRenderingContext2D, x: number, y: number): void {
     this.pos.x += x;
     this.pos.y += y;
@@ -117,19 +155,25 @@ export class LineCanvasComponent implements OnInit, OnChanges {
     ctx.lineTo(this.pos_r.x, this.pos_r.y);
   }
 
+  /**
+   * Draw an arc on `ctx` on (x,y) with radius r.
+   * 
+   * @param ctx - Canvas context
+   * @param x
+   * @param y 
+   * @param r - Radius.
+   */
   private arc(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): void {
-    //ctx.stroke();
-    //ctx.closePath();
-
-    //ctx.beginPath();
     ctx.arc(this.pos_r.x,this.pos_r.y,r,0,2*Math.PI);
-    //ctx.closePath();
-    //ctx.stroke();
-    
-    //ctx.beginPath();
     ctx.moveTo(this.pos_r.x,this.pos_r.y);
   }
 
+  /**
+   * Setup the canvas for the correct DPI.
+   * 
+   * @param canvas - Canvas HTML element.
+   * @returns Canvas context.
+   */
   private setupCanvas(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
     // Get the device pixel ratio, falling back to 1.
     var dpr = window.devicePixelRatio || 1;
@@ -146,6 +190,15 @@ export class LineCanvasComponent implements OnInit, OnChanges {
     return ctx;
   }
 
+  /**
+   * Perform the actions of a step in the animation. It calculates the data point to be drawn,
+   * also drawing any missing data points.
+   * 
+   * Has a maximum duration of `this.max_duration`, in ms.
+   * 
+   * @param ctx - Canvas context
+   * @param ts - Current timestamp.
+   */
   private anim_step(ctx: CanvasRenderingContext2D, ts: number): void {
     if (!this.start) this.start = ts;
     let dx = ts - this.start;
@@ -159,6 +212,20 @@ export class LineCanvasComponent implements OnInit, OnChanges {
     }
   }
 
+  /**
+   * Function that effectively draws each line and circle in the canvas.
+   * 
+   * `this.data` is being traversed but it's nearly impossible to have
+   * only one element at each timestamp, usually they are skipped.
+   * Eg: On one instant, this.data[4] is drawn, but on the next one
+   * it's time for this.data[10], the remaining points are missing, so
+   * they must be accounted for. That is why `this.prev_i` exists, to store
+   * the previous `i`. In the example, "I'm on 10, previous is 4, I need to
+   * draw everything from 5 to 10".
+   * 
+   * @param ctx - Canvas context.
+   * @param i - Index of `this.data`.
+   */
   private anim_draw(ctx: CanvasRenderingContext2D, i: number): void {
     for(;this.prev_i<i;this.prev_i++){
       let x = this.data.x[this.prev_i];

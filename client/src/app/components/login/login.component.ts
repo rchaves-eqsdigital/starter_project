@@ -5,14 +5,23 @@ import { SHA256 } from 'crypto-js';
 import { ApiService } from '../../api.service';
 import { CookieService } from 'ngx-cookie-service';
 
+/**
+ * Login screen.
+ */
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
+  /**
+   * String to show on screen as error, if login fails.
+   */
   private invalidString = "The entered credentials are invalid."
 
+  /**
+   * Form structure.
+   */
   loginForm = this.formBuilder.group({
     email: '',
     password: ''
@@ -22,12 +31,24 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private apiService: ApiService,
     private router: Router,
-    private girlScouts: CookieService) { }
+    private girlScouts: CookieService
+  ) { }
 
   ngOnInit(): void {
-    this.girlScouts.deleteAll();
+    this.girlScouts.deleteAll(); // TODO: remove. As is, a user is logged off if he goes to /login.
   }
 
+  /**
+   * Called when Login is clicked.
+   * 
+   * Password is hashed with SHA-256 and passed together with the email
+   * to the Login API call.
+   * Sign-In button is changed to spin until the server replies.
+   * If there is an error, button stops spinning and an error message is
+   * displayed.
+   * 
+   * @returns Void promise.
+   */
   async onSubmit(): Promise<void> {
     document.getElementById("errorMsg").innerHTML = "";
     let password = SHA256(this.loginForm.value.password).toString();
@@ -39,6 +60,7 @@ export class LoginComponent implements OnInit {
       document.getElementById("signIn").innerHTML = signIn_backup;
       if (x.error) {
         console.log("Error logging in:",x.error);
+        // TODO: if ("user already logged in" in x.error) -> /sensors
         // Loading -> ERROR
         document.getElementById("errorMsg").innerHTML = this.invalidString;
       } else {

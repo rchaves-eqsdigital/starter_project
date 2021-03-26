@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  apiURL: "https://api.eqs.ricardochaves.pt/v0/"
 };

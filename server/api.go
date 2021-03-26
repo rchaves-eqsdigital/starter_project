@@ -179,7 +179,6 @@ func apiSensorAdd(w http.ResponseWriter, r *http.Request, id int) {
 
 // apiUser is the handler for `/api/v0/user/`.
 // Returns a list with the existing users.
-// TODO: Users are being returned with the full struct. Take password out.
 func apiUser(w http.ResponseWriter, r *http.Request, id int) {
 	if !corsAndAuth(&w,r) {
 		return
@@ -232,6 +231,7 @@ func apiUserData(w http.ResponseWriter, r *http.Request, id int) {
 
 // apiUserAdd is the handler for `/api/v0/user/add`.
 // Add user.
+// TODO.
 func apiUserAdd(w http.ResponseWriter, r *http.Request, id int) {
 	if !corsAndAuth(&w,r) {
 		return

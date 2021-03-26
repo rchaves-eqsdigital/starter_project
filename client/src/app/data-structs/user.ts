@@ -1,11 +1,22 @@
 import { Item } from './item';
 
+/**
+ * User class, is also an Item.
+ */
 export class User implements Item {
     private Pic: String; // Base64 Encoded
     private Name: String;
     private Email: String;
     private ID: String;
 
+    /**
+     * Constructor.
+     * 
+     * @param pic - User pic, Base64 encoded.
+     * @param name - User name.
+     * @param email - User email.
+     * @param id - User ID, as stored in the DB.
+     */
     constructor(pic: String, name: String, email: String, id: String) {
         this.Pic = pic;
         this.Name = name;
@@ -14,43 +25,45 @@ export class User implements Item {
     }
 
     /**
-     * getPic
+     * `this.Pic` getter.
      */
     public getPic(): String {
         return this.Pic === null ? "" : this.Pic;
     }
 
     /**
-     * getName
+     * `this.Name` getter.
      */
     public getName(): String {
         return this.Name;
     }
 
     /**
-     * getEmail
+     * `this.Email` getter.
      */
     public getEmail(): String {
         return this.Email;
     }
 
-    /*** Item interface implementations ***/
     /**
-     * getTitle
+     * @implements Item
+     * @returns Name String.
      */
     public getTitle(): String {
         return this.getName()
     }
 
     /**
-     * getTitle
+     * @implements Item
+     * @returns Email string.
      */
     public getBody(): String {
         return this.getEmail()
     }
 
     /**
-     * getID
+     * @implements Item
+     * @returns ID string.
      */
     public getID(): String {
         return this.ID;

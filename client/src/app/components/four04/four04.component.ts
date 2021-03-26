@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
+/**
+ * 404 page.
+ */
 @Component({
   selector: 'app-four04',
   templateUrl: './four04.component.html',

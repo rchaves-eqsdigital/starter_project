@@ -1,10 +1,20 @@
 import { Item } from './item';
 
+/**
+ * Sensor class, is also an Item.
+ */
 export class Sensor implements Item {
     private Pic: String; // Base64 Encoded
     private Name: String;
     private Body: String;
 
+    /**
+     * Constructor.
+     * 
+     * @param pic - Sensor pic.
+     * @param name - Sensor name.
+     * @param body - Text body, "regular sensor" by default.
+     */
     constructor(pic: String, name: String, body: String="regular sensor") {
         if (pic === null) {
             this.Pic = "";
@@ -16,36 +26,40 @@ export class Sensor implements Item {
     }
 
     /**
-     * getPic
+     * `this.Pic` getter.
      */
     public getPic(): String {
         return this.Pic;
     }
 
     /**
-     * getName
+     * `this.Name` getter.
+     * 
+     * @returns Name String.
      */
     public getName(): String {
         return this.Name;
     }
 
-    /*** Item interface implementations ***/
     /**
-     * getTitle
+     * @implements Item
+     * @returns Name String.
      */
     public getTitle(): String {
         return this.getName();
     }
 
     /**
-     * getTitle
+     * @implements Item
+     * @returns Body String.
      */
     public getBody(): String {
         return this.Body;
     }
-
+ 
     /**
-     * getID
+     * @implements Item
+     * @returns 
      */
     public getID(): String {
         return this.getName();

@@ -2,21 +2,36 @@ import { Component, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { ApiService } from '../../api.service';
 import { Item } from '../../data-structs/item';
 
+/**
+ * Generic form to edit an Item. Only supports one field (body text) at the moment.
+ */
 @Component({
   selector: 'app-item-form',
   templateUrl: './item-form.component.html',
   styleUrls: ['./item-form.component.css']
 })
 export class ItemFormComponent implements OnInit {
+  /**
+   * Item to be edited.
+   */
   @Input()
   item: Item;
 
+  /**
+   * Type of the Item, as a string.
+   */
   @Input()
   type: string;
 
+  /**
+   * ID of the Item to be edited.
+   */
   @Input()
   id: string;
 
+  /**
+   * Textbox with the new data to be saved.
+   */
   @ViewChild("textbox")
   value: ElementRef;
 
@@ -26,6 +41,9 @@ export class ItemFormComponent implements OnInit {
     this.initModal();
   }
 
+  /**
+   * Setup the modal that is shown when then "Edit" button is clicked.
+   */
   private initModal(): void {
     // Get the modal
     var modal = document.getElementById("myModal");
@@ -54,6 +72,9 @@ export class ItemFormComponent implements OnInit {
     } 
   }
 
+  /**
+   * Form submission function. Sends edit request to the API.
+   */
   public async formClick(): Promise<void> {
     let data = this.value.nativeElement.value; // TODO: do this with JSON ({fieldToEdit: newValue})
     console.log(data);
