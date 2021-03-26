@@ -34,9 +34,7 @@ export class LoginComponent implements OnInit {
     private girlScouts: CookieService
   ) { }
 
-  ngOnInit(): void {
-    this.girlScouts.deleteAll(); // TODO: remove. As is, a user is logged off if he goes to /login.
-  }
+  ngOnInit(): void { }
 
   /**
    * Called when Login is clicked.
@@ -60,7 +58,10 @@ export class LoginComponent implements OnInit {
       document.getElementById("signIn").innerHTML = signIn_backup;
       if (x.error) {
         console.log("Error logging in:",x.error);
-        // TODO: if ("user already logged in" in x.error) -> /sensors
+        // User already logged in.
+        if (x.error.toString().includes("user already logged in")){
+          this.router.navigateByUrl("sensors");  
+        }
         // Loading -> ERROR
         document.getElementById("errorMsg").innerHTML = this.invalidString;
       } else {
