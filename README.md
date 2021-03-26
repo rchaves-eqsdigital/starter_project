@@ -7,6 +7,24 @@ A live online version of this project is available [here](http://eqs.ricardochav
 
 A list of the available API endpoints are available at the start of the [api file](server/api.go).
 
+This project was only tested in Firefox.
+
+----------
+## Setting up locally
+### Client
+Angular 11.2.3 was used.
+In the `client/` directory:
+```
+npm install
+ng serve
+```
+### Go
+Go 1.15.1 was used.
+In the repo's root directory:
+```
+make clean && make && bin/server
+```
+
 ----------
 ## Relevant Features
 ### Client+Server
