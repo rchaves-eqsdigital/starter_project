@@ -31,10 +31,12 @@ type DataEntry struct {
 	InOut    string // "In", "Out"
 }
 
+// String represents a Sensor as string.
 func (s Sensor) String() string {
 	return fmt.Sprintf("%s, %d entries", s.RoomID, len(s.data))
 }
 
+// String represents a DataEntry as string.
 func (d DataEntry) String() string {
 	return d.Date.String() + ": " + fmt.Sprint(d.Temp) + "ºC " + d.InOut
 }
@@ -43,7 +45,8 @@ func (d DataEntry) String() string {
 //////////////////// DB /////////////////////////
 /////////////////////////////////////////////////
 
-// Required before using the DB
+// InitSensorDB performs the required initializations of the sensor's DB.
+// MUST be called before using the DB.
 func (a *App) InitSensorDB() error {
 	var err error
 	a.DB_s, err = gorm.Open(sqlite.Open("db/sensors.db"), &gorm.Config{
@@ -70,7 +73,7 @@ func (a *App) InitSensorDB() error {
 	return nil
 }
 
-// Reads dataset from file and loads it into the DB
+// loadDataset reads a dataset from file and loads it into the DB
 // CSV format: id,room_id/id,noted_date,temp,out/in
 // Date format:08-12-2018 09:29
 func (a *App) loadDataset() {
@@ -152,6 +155,7 @@ func (a *App) loadDataset() {
 	log.Printf("Finished loading dataset: %s", elapsedTime)
 }
 
+// workerThread is the behaviour of a worker, when loading the dataset.
 func workerThread(a *App, w int, jobs <-chan []DataEntry, done chan<- int) {
 	for v := range jobs {
 		tmp := make([]DataEntry, len(v))
@@ -161,29 +165,34 @@ func workerThread(a *App, w int, jobs <-chan []DataEntry, done chan<- int) {
 	done <- w
 }
 
-// Creates a sensor in the DB from existing struct
+// CreateSensor takes a Sensor and creates it in the DB.
 func (a *App) CreateSensor(s *Sensor) error {
 	return a.DB_s.Create(s).Error
 }
 
+// CreateSensorBatch takes a Sensor array and creates it in the DB.
 func (a *App) CreateSensorBatch(s *[]Sensor) error {
 	return a.DB_s.Create(s).Error
 }
 
+// CreateDataEntry takes a DataEntry and creates it in the DB.
 func (a *App) CreateDataEntry(d *DataEntry) error {
 	return a.DB_s.Create(d).Error
 }
 
+// CreateDataEntryBatch takes a DataEntry array and creates it in the DB.
 func (a *App) CreateDataEntryBatch(d *[]DataEntry) error {
 	return a.DB_s.Create(d).Error
 }
 
+// ListSensors returns a list with existing sensors in the DB.
 func (a *App) ListSensors() ([]Sensor, error) {
 	var sensors []Sensor
 	err := a.DB_s.Find(&sensors).Error
 	return sensors, err
 }
 
+// ListDataEntries returns a list with existing DataEntry's for Sensor `s`.
 func (a *App) ListDataEntries(s *Sensor) ([]DataEntry, error) {
 
 	s.data = make([]DataEntry, 0)
@@ -201,6 +210,7 @@ func (a *App) ListDataEntries(s *Sensor) ([]DataEntry, error) {
 	return s.data, nil
 }
 
+// DeleteSensor deletes sensor with id `ìd` from the DB.
 func (a *App) DeleteSensor(id int) error {
 	var sensor Sensor
 	sensor.ID = uint(id)
@@ -218,6 +228,7 @@ func (a *App) DeleteSensor(id int) error {
 	return nil
 }
 
+// UpdateSensor updates the field RoomID on the sensor with id `id`.
 func (a *App) UpdateSensor(id int, roomid string) error {
 	sensor := &Sensor{}
 	err := a.DB_s.First(sensor, id).Error
@@ -230,6 +241,7 @@ func (a *App) UpdateSensor(id int, roomid string) error {
 	return nil
 }
 
+// ExistsSensor checks if a sensor with id `id` exists, returning (true,Sensor) if so.
 func (a *App) ExistsSensor(id int) (bool, *Sensor) {
 	sensor := &Sensor{}
 	err := a.DB_s.First(sensor, id).Error

@@ -3,6 +3,7 @@ package main
 import (
 	"./errs"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/sqlite"
@@ -21,13 +22,14 @@ type User struct {
 
 type Session struct {
 	gorm.Model
-	UserID    uint
-	Tok   string
-	Valid bool
+	UserID uint
+	Tok    string
+	Valid  bool
 }
 
+// String represents a User as string.
 func (u *User) String() string {
-	return u.Email + ":" + string(u.Password)
+	return fmt.Sprintf("%s: %s, Token: %s", u.Email, u.Name, u.Tok)
 }
 
 // Login takes a users email and password, returning (sessionToken,error)
@@ -77,6 +79,8 @@ func (a *App) Logout(tok string) error {
 //////////////////// DB /////////////////////////
 /////////////////////////////////////////////////
 
+// InitUserDB performs the required initializations of the user's DB.
+// MUST be called before using the DB.
 func (a *App) InitUserDB() error {
 	var err error
 	a.DB_u, err = gorm.Open(sqlite.Open("db/users.db"), &gorm.Config{
@@ -87,7 +91,7 @@ func (a *App) InitUserDB() error {
 	return a.DB_u.AutoMigrate(&User{}, &Session{})
 }
 
-// Creates a new user/account
+// CreateUser creates in the DB a new user/account with `email`, `name` and hashed password `firstHash`.
 func (a *App) CreateUser(email string, name string, firstHash []byte) error {
 	// Generating a random salt isn't required, already handled by bcrypt
 	// Appending it to the base hash
@@ -102,12 +106,15 @@ func (a *App) CreateUser(email string, name string, firstHash []byte) error {
 	return err
 }
 
+// ListUsers returns a list with existing users in the DB.
 func (a *App) ListUsers() ([]User, error) {
 	var users []User
 	err := a.DB_u.Find(&users).Error
 	return users, err
 }
 
+// ListUsersClean returns a list with existing users in the DB,
+// but with the Password and Tok fields stripped out.
 func (a *App) ListUsersClean() ([]User, error) {
 	users, err := a.ListUsers()
 	if err != nil {
@@ -120,12 +127,16 @@ func (a *App) ListUsersClean() ([]User, error) {
 	return users, err
 }
 
+// ListUsersEmail returns a list with existing users in the DB that have
+// the email `email`.
 func (a *App) ListUsersEmail(email string) ([]User, error) {
 	var users []User
 	err := a.DB_u.Where("Email = ?", email).Find(&users).Error
 	return users, err
 }
 
+// ListUsersEmailClean returns a list with existing users in the DB that have
+// the email `email`, but with the Password and Tok fields stripped out.
 func (a *App) ListUsersEmailClean(email string) ([]User, error) {
 	users, err := a.ListUsersEmail(email)
 	if err != nil {
@@ -138,6 +149,7 @@ func (a *App) ListUsersEmailClean(email string) ([]User, error) {
 	return users, err
 }
 
+// ExistsUser checks if a user with id `id` exists, returning (true,*User) if so.
 func (a *App) ExistsUser(id int) (bool, *User) {
 	user := &User{}
 	err := a.DB_u.First(user, id).Error
@@ -147,16 +159,22 @@ func (a *App) ExistsUser(id int) (bool, *User) {
 	return true, user
 }
 
+// DeleteUser deletes from the DB a user with email `email`
+// TODO: implement.
 func (a *App) DeleteUser(email string) error {
-	var user User
-	err := a.DB_u.First(&user, 1).Error
-	errs.F_err(err)
+	/*
+		var user User
+		err := a.DB_u.First(&user, 1).Error
+		errs.F_err(err)
 
-	err = a.DB_u.Delete(&user, 1).Error
-	errs.F_err(err)
+		err = a.DB_u.Delete(&user, 1).Error
+		errs.F_err(err)
+
+	*/
 	return nil
 }
 
+// UpdateUser updates the email of a user with id `id`.
 func (a *App) UpdateUser(id int, email string) error {
 	user := &User{}
 	err := a.DB_u.First(user, id).Error
@@ -181,7 +199,7 @@ func (a *App) getSessionFromUser(userID int) (*Session, error) {
 	// First, get User
 	ok, u := a.ExistsUser(userID)
 	if !ok {
-		return nil, errors.New("invalid userID "+string(userID))
+		return nil, errors.New("invalid userID " + string(userID))
 	}
 	s, err := a.getSessionFromTok(u.Tok)
 	if err != nil {
@@ -190,6 +208,8 @@ func (a *App) getSessionFromUser(userID int) (*Session, error) {
 	return s, nil
 }
 
+// getUserFromSession takes a session token, returns the User (if any)
+// with that token.
 func (a *App) getUserFromSession(tok string) (*User, error) {
 	s, err := a.getSessionFromTok(tok)
 	if err != nil {
@@ -203,6 +223,8 @@ func (a *App) getUserFromSession(tok string) (*User, error) {
 	return user, err
 }
 
+// InvalidateSession invalidates the session with token `tok`, updating both the
+// corresponding Session and User in the DB.
 func (a *App) InvalidateSession(tok string) error {
 	s, err := a.getSessionFromTok(tok)
 	if err != nil {
@@ -225,16 +247,17 @@ func (a *App) InvalidateSession(tok string) error {
 	return err
 }
 
-// TestSession returns true if the session represented by `tok` is valid/exists
-func (a *App) TestSession(tok string) bool {
+// ExistsSession returns true if the session represented by `tok` is valid/exists
+func (a *App) ExistsSession(tok string) bool {
 	_, err := a.getSessionFromTok(tok)
 	return err == nil
 }
 
+// CreateSession creates a new session in the DB for user with id `userID`.
 func (a *App) CreateSession(userID int) (string, error) {
 	ok, u := a.ExistsUser(userID)
 	if !ok {
-		return "", errors.New("invalid userID "+string(userID))
+		return "", errors.New("invalid userID " + string(userID))
 	}
 	// Generate a new token
 	tok := uuid.UUID.String(uuid.New())

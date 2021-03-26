@@ -14,6 +14,10 @@ import (
 	"sync"
 )
 
+// Run is the entry point to the API. Redirects everything to be handled
+// by Serve.
+//
+// Running on localhost:8080.
 func (a App) Run() {
 	http.HandleFunc("/", Serve)
 
@@ -91,7 +95,7 @@ func apiLogin(w http.ResponseWriter, r *http.Request, id int) {
 
 // apiLogout is the handler for `/api/v0/logout/`.
 func apiLogout(w http.ResponseWriter, r *http.Request, id int) {
-	if !corsAndAuth(&w,r) {
+	if !corsAndAuth(&w, r) {
 		return
 	}
 	body, err := getPostBody(r)
@@ -111,7 +115,7 @@ func apiLogout(w http.ResponseWriter, r *http.Request, id int) {
 // If the `id=number` parameter is present, it instead returns the
 // sensor with that ID.
 func apiSensor(w http.ResponseWriter, r *http.Request, id int) {
-	if !corsAndAuth(&w,r) {
+	if !corsAndAuth(&w, r) {
 		return
 	}
 	data, err := a.ListSensors()
@@ -144,7 +148,7 @@ func apiSensor(w http.ResponseWriter, r *http.Request, id int) {
 // Returns data of sensor `ID`.
 // TODO: don't return everything at once, implement chunked requests
 func apiSensorData(w http.ResponseWriter, r *http.Request, id int) {
-	if !corsAndAuth(&w,r) {
+	if !corsAndAuth(&w, r) {
 		return
 	}
 	// Check if ID is valid
@@ -163,7 +167,7 @@ func apiSensorData(w http.ResponseWriter, r *http.Request, id int) {
 // apiSensorDataAdd is the handler for `/api/v0/sensor/([0-9]+)/data/add`.
 // Add sensor data reading.
 func apiSensorDataAdd(w http.ResponseWriter, r *http.Request, id int) {
-	if !corsAndAuth(&w,r) {
+	if !corsAndAuth(&w, r) {
 		return
 	}
 	log.Println(r.URL.Path, id)
@@ -172,7 +176,7 @@ func apiSensorDataAdd(w http.ResponseWriter, r *http.Request, id int) {
 // apiSensor add is the handler for `/api/v0/sensor/add`.
 // Add new sensor.
 func apiSensorAdd(w http.ResponseWriter, r *http.Request, id int) {
-	if !corsAndAuth(&w,r) {
+	if !corsAndAuth(&w, r) {
 		return
 	}
 }
@@ -180,7 +184,7 @@ func apiSensorAdd(w http.ResponseWriter, r *http.Request, id int) {
 // apiUser is the handler for `/api/v0/user/`.
 // Returns a list with the existing users.
 func apiUser(w http.ResponseWriter, r *http.Request, id int) {
-	if !corsAndAuth(&w,r) {
+	if !corsAndAuth(&w, r) {
 		return
 	}
 	data, err := a.ListUsersClean()
@@ -212,7 +216,7 @@ func apiUser(w http.ResponseWriter, r *http.Request, id int) {
 // apiUserData is the handler for `/api/v0/user/([0-9]+)/data/`.
 // Get user data.
 func apiUserData(w http.ResponseWriter, r *http.Request, id int) {
-	if !corsAndAuth(&w,r) {
+	if !corsAndAuth(&w, r) {
 		return
 	}
 	data, err := a.ListUsersClean()
@@ -233,7 +237,7 @@ func apiUserData(w http.ResponseWriter, r *http.Request, id int) {
 // Add user.
 // TODO.
 func apiUserAdd(w http.ResponseWriter, r *http.Request, id int) {
-	if !corsAndAuth(&w,r) {
+	if !corsAndAuth(&w, r) {
 		return
 	}
 }
@@ -241,7 +245,7 @@ func apiUserAdd(w http.ResponseWriter, r *http.Request, id int) {
 // apiSensorEdit is the handler for `/api/v0/sensor/edit`.
 // It edits a sensor in the DB.
 func apiSensorEdit(w http.ResponseWriter, r *http.Request, id int) {
-	if !corsAndAuth(&w,r) {
+	if !corsAndAuth(&w, r) {
 		return
 	}
 	body, err := getPostBody(r)
@@ -261,7 +265,7 @@ func apiSensorEdit(w http.ResponseWriter, r *http.Request, id int) {
 // apiUserEdit is the handler for `/api/v0/user/edit`.
 // It edits a user in the DB.
 func apiUserEdit(w http.ResponseWriter, r *http.Request, id int) {
-	if !corsAndAuth(&w,r) {
+	if !corsAndAuth(&w, r) {
 		return
 	}
 	body, err := getPostBody(r)
@@ -281,7 +285,7 @@ func apiUserEdit(w http.ResponseWriter, r *http.Request, id int) {
 /***********************************/
 /********** AUXILIARY **************/
 /***********************************/
-
+// corsAndAuth sets up CORS and checks if request is authorized.
 func corsAndAuth(w *http.ResponseWriter, r *http.Request) bool {
 	enableCors(w)
 	if r.Method == "OPTIONS" {
@@ -294,6 +298,7 @@ func corsAndAuth(w *http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
+// auth checks if an incoming request has a valid Authorization header.
 func auth(r *http.Request) error {
 	authorization := strings.Split(r.Header.Get("Authorization"), " ")
 	// method := authorization[0]
@@ -318,6 +323,7 @@ func sendAsJson(w http.ResponseWriter, val interface{}) {
 	w.Write(ret)
 }
 
+// enableCors adds generic CORS headers to a response.
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")

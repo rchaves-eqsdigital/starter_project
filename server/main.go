@@ -13,7 +13,7 @@ type App struct {
 	hashCost int      // cost for bcrypt
 }
 
-var a = App{} // TODO: Fix, maybe singleton?
+var a = App{} // TODO: Fix. Global atm, maybe singleton?
 
 func (a *App) Init() error {
 	err := a.InitUserDB()
