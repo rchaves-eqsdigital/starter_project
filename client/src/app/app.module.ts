@@ -7,7 +7,7 @@ import { UsersComponent } from './users/users.component';
 import { SensorsComponent } from './sensors/sensors.component';
 import { BottomNavComponent } from './bottom-nav/bottom-nav.component';
 import { TopNavComponent } from './top-nav/top-nav.component';
-import { AppRoutingModule } from './app-routing.module';
+import { AppRoutingModule } from './routing/app-routing.module';
 import { FloatButtonComponent } from './float-button/float-button.component';
 import { ItemListComponent } from './item-list/item-list.component';
 import { ItemDetailsComponent } from './item-details/item-details.component';
@@ -20,7 +20,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
-import { AuthInterceptor } from './auth-interceptor';
+import { AuthInterceptor } from './routing/auth-interceptor';
 import { Four04Component } from './four04/four04.component';
 
 @NgModule({

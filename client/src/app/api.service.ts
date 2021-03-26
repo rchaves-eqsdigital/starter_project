@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { DataEntry } from './data-entry';
+import { DataEntry } from './data-structs/data-entry';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { Logging } from './logging';
-import { Sensor } from './sensors/sensor';
-import { User } from './users/user';
+import { Logging } from './logging/logging';
+import { Sensor } from './data-structs/sensor';
+import { User } from './data-structs/user';
 import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({

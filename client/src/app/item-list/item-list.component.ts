@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Item } from './item';
+import { Item } from '../data-structs/item';
 
 @Component({
   selector: 'app-item-list',

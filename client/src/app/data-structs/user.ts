@@ -1,4 +1,4 @@
-import { Item } from '../item-list/item';
+import { Item } from './item';
 
 export class User implements Item {
     private Pic: String; // Base64 Encoded

@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { Four04Component } from './four04/four04.component';
-import { ItemDetailsComponent } from './item-details/item-details.component';
-import { LoginComponent } from './login/login.component';
-import { SensorsComponent } from './sensors/sensors.component';
-import { UsersComponent } from './users/users.component';
+import { Four04Component } from '../four04/four04.component';
+import { ItemDetailsComponent } from '../item-details/item-details.component';
+import { LoginComponent } from '../login/login.component';
+import { SensorsComponent } from '../sensors/sensors.component';
+import { UsersComponent } from '../users/users.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full'},
