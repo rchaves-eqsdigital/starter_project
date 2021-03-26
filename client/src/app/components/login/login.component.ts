@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-import { SHA256 } from 'crypto-js';
+import { sha256 } from 'js-sha256';
 import { ApiService } from '../../api.service';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -49,7 +49,7 @@ export class LoginComponent implements OnInit {
    */
   async onSubmit(): Promise<void> {
     document.getElementById("errorMsg").innerHTML = "";
-    let password = SHA256(this.loginForm.value.password).toString();
+    let password = sha256(this.loginForm.value.password);
     // Loading
     let signIn_backup = document.getElementById("signIn").innerHTML;
     document.getElementById("signIn").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
