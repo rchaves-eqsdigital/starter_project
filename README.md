@@ -78,7 +78,7 @@ make clean && make && bin/server
 ### Server
 - Return [API](server/api.go) errors to client, instead of just printing them.
 - Implement tests for the API
-- Implement session timeout. Events? Thread in a loop checking if the token should be invalidated?
+- Implement session timeout. Events? Thread in a loop checking if the token should be invalidated? Should refresh on every `auth`.
 
 ### Client + Server
 - Implement chunked requests for `apiSensorData`. At the moment if there are 10MB of sensor data, they are returned at once, and displayed in the charts at once.
