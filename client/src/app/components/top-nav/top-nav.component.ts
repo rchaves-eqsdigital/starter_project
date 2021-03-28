@@ -2,7 +2,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { Logging } from 'src/app/logging/logging';
-import { environment } from 'src/environments/environment';
 import { ApiService } from '../../api.service';
 
 /**
@@ -33,7 +32,9 @@ export class TopNavComponent implements OnInit {
     private router: Router
   ) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.updateUsername();
+  }
 
   /**
    * Toggle between dark and light mode, analogous to an IRL
@@ -84,6 +85,19 @@ export class TopNavComponent implements OnInit {
   private setDark(): void {
     document.body.classList.toggle('light',false);
     document.body.classList.toggle('dark',true);
+  }
+
+  /**
+   * Display username of logged in user.
+   */
+  private updateUsername(): void {
+    // Get username from token
+    console.log(this.girlScouts.get("token"));
+    let partial_token = this.girlScouts.get("token").substring(0,8);
+    this.apiService.getUserFromTok(partial_token).then(response => {
+      // Fill "username" with username
+      document.getElementById("username").innerHTML = response.Name;
+    });
   }
 
 }

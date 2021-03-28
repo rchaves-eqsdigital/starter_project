@@ -63,6 +63,7 @@ make clean && make && bin/server
 - The [Item](client/src/app/data-structs/item.ts) interface, although generic, can be limited (perhaps because it's generic?), only having Pic, Title and Body fields.
 - The [sensor](client/src/app/components/sensors/sensors.component.html) and [user](client/src/app/components/users/users.component.html) components have too many things in common, should be generalized.
 - Dark mode switch doesn't keep its state when the route changes.
+- Navigating to */login* when logged in deletes the session cookie. Bug or feature?
 
 ### Server
 - Global `App` variable available across every file in the package. Implement using a singleton, perhaps?

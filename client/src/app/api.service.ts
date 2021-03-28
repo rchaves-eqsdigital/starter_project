@@ -105,6 +105,22 @@ export class ApiService {
     return ret;
   }
 
+    /**
+   * Get the user with the provided partial token.
+   * 
+   * @param tok - First 8 chars of a user's session token.
+   * @returns Promise with a User (directly from users.go User struct).
+   */
+     public async getUserFromTok(tok: string): Promise<any> {
+      let url: string = environment.apiURL+"user?tok="+tok;
+      Logging.log(url);
+  
+      const data = await this.http.get<any>(url, this.requestOptions()).toPromise()
+      let ret = new User(null,data.Name,data.Email,data.ID);
+      Logging.log("[getUser] Got item: "+ret);
+      return ret;
+    }
+
   /**
    * Edit a user's email or sensor's 
    * 

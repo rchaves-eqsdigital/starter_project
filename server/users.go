@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
 
 	"./errs"
 	"github.com/google/uuid"
@@ -174,7 +173,6 @@ func (a *App) ExistsUser(id int) (bool, *User) {
 func (a *App) DeleteUser(id int) error {
 	err := a.DB_u.Delete(&User{}, id).Error
 	if err != nil {
-		log.Println("[DeleteUser] error deleting user")
 		return err
 	}
 	return nil
@@ -185,7 +183,6 @@ func (a *App) UpdateUser(id int, email string) error {
 	user := &User{}
 	err := a.DB_u.First(user, id).Error
 	if err != nil {
-		log.Println("couldn't find user with ID", id)
 		return err
 	}
 	user.Email = email
@@ -296,6 +293,7 @@ func (a *App) ListOpenSessions() ([]Session, error) {
 	return sessions, err
 }
 
+// RefreshSession "touches" the session identified by `tok`
 func (a *App) RefreshSession(tok string) error {
 	session, err := a.getSessionFromTok(tok)
 	if err != nil {
@@ -303,6 +301,24 @@ func (a *App) RefreshSession(tok string) error {
 	}
 	err = a.DB_u.Save(&session).Error
 	return err
+}
+
+// GetUserFromPartialTok gets a User, if it exists, from the first 8 chars of
+// a session token.
+func (a *App) GetUserFromPartialTok(tok string) (*User, error) {
+	var s *Session
+	err := a.DB_u.Where("Tok LIKE ?", fmt.Sprintf("%%%s%%", tok)).First(&s).Error
+	if err != nil {
+		return nil, err
+	} else if s == nil {
+		return nil, errors.New("couldn't find session")
+	}
+	var user *User
+	user, err = a.getUserFromSession(s.Tok)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 // removeSession removes the Session at pos `i` from the array.

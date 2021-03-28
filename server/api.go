@@ -190,10 +190,11 @@ func apiUser(w http.ResponseWriter, r *http.Request, id int) {
 	}
 	data, err := a.ListUsersClean()
 	errs.F_err(err)
-	keys, ok := r.URL.Query()["id"]
-	if ok {
+	keys_id, ok_id := r.URL.Query()["id"]
+	keys_tok, ok_tok := r.URL.Query()["tok"] // first 7 digits
+	if ok_id {
 		// Asking for a single user with id in GET parameters
-		id, err = strconv.Atoi(keys[0])
+		id, err = strconv.Atoi(keys_id[0])
 		if err != nil {
 			log.Println("error parsing GET[id]", err.Error()) //TODO: return error
 			return
@@ -208,6 +209,17 @@ func apiUser(w http.ResponseWriter, r *http.Request, id int) {
 		}
 		// Didn't find ID
 		http.NotFound(w, r)
+	} else if ok_tok {
+		tok := keys_tok[0]
+		var user *User
+		user, err := a.GetUserFromPartialTok(tok)
+		if err != nil {
+			log.Printf("[%s] couldn't find user with tok %s", r.URL.Path, tok)
+			http.NotFound(w, r)
+			return
+		}
+		log.Printf("[%s] returning user {%v} for tok %s", r.URL.Path, user, tok)
+		sendAsJson(w, user)
 	} else {
 		log.Printf("[%s] returning %T of len %d", r.URL.Path, data, len(data))
 		sendAsJson(w, data)
