@@ -74,12 +74,10 @@ make clean && make && bin/server
 - Implement "edit forms" that allow multiple fields to be changed, dynamically
 - On [line-canvas](client/src/app/components/line-canvas/line-canvas.component.ts) fix grid scaling/precision
 - Get [ChartJS](client/src/app/components/line-chartjs/line-chartjs.component.ts) working with the time scale, instead of converting the dates to a linear format "[0,1,...]" as a workaround.
-- Improve EDIT UX: remove alert, close modal and display a check mark or red cross indicating op result.
 
 ### Server
 - Return [API](server/api.go) errors to client, instead of just printing them.
 - Implement tests for the API
-- Implement session timeout. Events? Thread in a loop checking if the token should be invalidated? Should refresh on every `auth`.
 
 ### Client + Server
 - Implement chunked requests for `apiSensorData`. At the moment if there are 10MB of sensor data, they are returned at once, and displayed in the charts at once.
