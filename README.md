@@ -75,7 +75,6 @@ make clean && make && bin/server
 - On [line-canvas](client/src/app/components/line-canvas/line-canvas.component.ts) fix grid scaling/precision
 - Get [ChartJS](client/src/app/components/line-chartjs/line-chartjs.component.ts) working with the time scale, instead of converting the dates to a linear format "[0,1,...]" as a workaround.
 - Improve EDIT UX: remove alert, close modal and display a check mark or red cross indicating op result.
-- Debug Chromium graphs error.
 
 ### Server
 - Return [API](server/api.go) errors to client, instead of just printing them.
