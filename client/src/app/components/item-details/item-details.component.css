@@ -1,0 +1,14 @@
+.status {
+    visibility: hidden;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.fadeout {
+    visibility: visible;
+    transition-property: opacity;
+    transition-duration: 1s;
+    transition-timing-function: ease-in-out;
+    transition-delay: 3s;
+    opacity: 0;
+}

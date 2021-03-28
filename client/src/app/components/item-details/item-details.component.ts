@@ -36,6 +36,19 @@ export class ItemDetailsComponent implements OnInit {
   }
 
   /**
+   * Handles form-edit close.
+   * 
+   * @param data - new data that was edited.
+   */
+  formClosed(data) {
+    if (data !== null) {
+      // Edit was successful
+      document.getElementById("data_value").innerHTML = data;
+      document.getElementById("data_ok").classList.add("fadeout");
+    }
+  }
+
+  /**
    * Parse Item type from the URL.
    * 
    * @returns string with Item type.

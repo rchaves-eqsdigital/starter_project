@@ -2,8 +2,13 @@
 <div class="content" *ngIf="item; else errorBlock">
     <img src="{{item.getPic()}}"/>
     <h2>{{item.getTitle()}}</h2>
-    <p>{{item.getBody()}}</p>
-    <app-item-form [item]="item" [type]="this.getType()" [id]="this.getID()"></app-item-form>
+    <div>
+        <p id="data_value" style="display: inline-block;">{{item.getBody()}}</p>
+        <span id="data_ok" class="status"><i class="fa fa-check-circle"></i></span>
+        <span id="data_bad" class="status"><i class="fa fa-times"></i></span>
+    </div>
+    <app-item-form [item]="item" [type]="this.getType()" [id]="this.getID()"
+    (onClose)="this.formClosed($event)"></app-item-form>
     <app-graph *ngIf="this.getType()=='sensor'" [id]="this.getID()"></app-graph>
 </div>
 <ng-template #errorBlock>

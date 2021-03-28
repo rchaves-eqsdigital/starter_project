@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, OnInit, Output, EventEmitter } from '@angular/core';
 import { Logging } from 'src/app/logging/logging';
 import { ApiService } from '../../api.service';
 import { Item } from '../../data-structs/item';
@@ -29,6 +29,12 @@ export class ItemFormComponent implements OnInit {
    */
   @Input()
   id: string;
+
+  /**
+   * New edited value.
+   */
+  @Output()
+  onClose: EventEmitter<string> = new EventEmitter();
 
   /**
    * Textbox with the new data to be saved.
@@ -85,7 +91,11 @@ export class ItemFormComponent implements OnInit {
     }
     let payload = {'id':this.id,'data':data};
     await this.apiService.edit(this.type,JSON.stringify(payload));
-    alert("Saved! Refresh page to see the changes."); // TODO: Updated field on screen when it's changed.
+    this.onClose.emit(data); // Emitting the new changed data.
     document.getElementById("myModal").style.display = "none";
+  }
+
+  public editClick(): void {
+    document.getElementById("data_ok").classList.remove("fadeout");
   }
 }

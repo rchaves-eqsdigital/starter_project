@@ -46,6 +46,7 @@ make clean && make && bin/server
 - Dark mode, toggle available in the [top-bar](client/src/app/components/top-nav).
 - Custom [log](client/src/app/logging/logging.ts), automatically showing the function it was called from.
 - 401 and 403 [interceptor](client/src/app/routing/auth-interceptor.ts) redirecting to */login* when one of these errors occurs.
+- Edit field, with animated check mark on success.
 - Authentication token stored as a session cookie, used to authenticate API requests.
 
 ### Server
@@ -57,7 +58,7 @@ make clean && make && bin/server
 ----------
 ## Known Issues / Bad Software
 ### Client
-- ["Edit forms"](client/src/app/components/item-form) are not dynamic, only allowing one field to be changed. Furthermore, data isn't updated on screen when it's saved, requiring a page refresh.
+- ["Edit forms"](client/src/app/components/item-form) are not dynamic, only allowing one field to be changed.
 - ["Item details"](client/src/app/components/item-details/item-details.component.ts) component is only semi-generic, as it supports sensors and users, but hardcoded.
 - The [Item](client/src/app/data-structs/item.ts) interface, although generic, can be limited (perhaps because it's generic?), only having Pic, Title and Body fields.
 - The [sensor](client/src/app/components/sensors/sensors.component.html) and [user](client/src/app/components/users/users.component.html) components have too many things in common, should be generalized.
@@ -71,7 +72,6 @@ make clean && make && bin/server
 ## TODO/Future work
 ### Client
 - Implement "edit forms" that allow multiple fields to be changed, dynamically
-- Update edited fields instantly, without requiring a page refresh
 - On [line-canvas](client/src/app/components/line-canvas/line-canvas.component.ts) fix grid scaling/precision
 - Get [ChartJS](client/src/app/components/line-chartjs/line-chartjs.component.ts) working with the time scale, instead of converting the dates to a linear format "[0,1,...]" as a workaround.
 - Improve EDIT UX: remove alert, close modal and display a check mark or red cross indicating op result.
