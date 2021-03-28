@@ -1,7 +1,6 @@
 package main
 
 import (
-	"./errs"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -12,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	"./errs"
 )
 
 // Run is the entry point to the API. Redirects everything to be handled
