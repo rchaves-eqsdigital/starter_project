@@ -308,9 +308,14 @@ func auth(r *http.Request) error {
 		return errors.New("Invalid token. Unauthorized")
 	}
 	tok := authorization[1]
-	_, err := a.getSessionFromTok(tok)
-	if err != nil {
+	s, err := a.getSessionFromTok(tok)
+	if err != nil || !s.Valid {
 		return errors.New("Unauthorized")
+	}
+	err = a.RefreshSession(s.Tok)
+	if err != nil {
+		log.Println("[auth] error refreshing Session", err.Error())
+		return err
 	}
 	return nil
 }

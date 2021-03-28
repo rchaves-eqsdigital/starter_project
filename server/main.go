@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"log"
 	"strings"
+	"time"
 
 	"./errs"
 	"gorm.io/gorm"
@@ -34,6 +35,33 @@ func (a *App) Init() error {
 	return err
 }
 
+// SessionManage watches existing valid sessions and invalidates them after
+// 60 seconds without updates
+func (a *App) SessionManage() {
+	ttl := 60 * time.Second
+	go func() {
+		for {
+			sessions, err := a.ListOpenSessions()
+			errs.F_err(err)
+			for _, s := range sessions {
+				t := s.UpdatedAt
+				if time.Now().Sub(t) > ttl {
+					err = a.InvalidateSession(s.Tok)
+					if err != nil {
+						log.Println("[SessionManager] error revoking session",
+							s.ID, err.Error())
+					} else {
+						log.Println("[SessionManager] Revoked", s.String())
+					}
+				}
+			}
+			time.Sleep(5 * time.Second)
+		}
+	}()
+}
+
+// createDefaultUsers takes an array of emails and another of passwords, creating
+// users with these credentials.
 func createDefaultUsers(emails []string, passwords []string) {
 	if len(emails) != len(passwords) {
 		log.Println("[init] Error: Emails and Passwords don't have the same size.")
@@ -53,9 +81,10 @@ func createDefaultUsers(emails []string, passwords []string) {
 	close(done)
 }
 
+// createDefaultUser creates a user with the provided credentials.
 func createDefaultUser(email string, password string, done chan int) {
 	log.Println("[init] Creating user", email)
-	name := "default " + strings.Split(email, "@")[0]
+	name := strings.Title("default " + strings.Split(email, "@")[0])
 	hash := sha256.Sum256([]byte(password))
 	err := a.CreateUser(email, name, hash[:])
 	errs.F_err(err)
@@ -69,10 +98,11 @@ func main() {
 
 	sensors, _ := a.ListSensors()
 	log.Println("[main] Number of sensors:", len(sensors))
-	for i, _ := range sensors {
+	for i := range sensors {
 		a.ListDataEntries(&sensors[i])
 		log.Println("[main]", sensors[i])
 	}
 
+	a.SessionManage()
 	a.Run()
 }

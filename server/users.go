@@ -1,15 +1,16 @@
 package main
 
 import (
-	"./errs"
 	"errors"
 	"fmt"
+	"log"
+
+	"./errs"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"log"
 )
 
 type User struct {
@@ -30,6 +31,15 @@ type Session struct {
 // String represents a User as string.
 func (u *User) String() string {
 	return fmt.Sprintf("%s: %s, Token: %s", u.Email, u.Name, u.Tok)
+}
+
+// String represents a Session as a string.
+func (s *Session) String() string {
+	isValid := ""
+	if s.Valid {
+		isValid = "valid"
+	}
+	return fmt.Sprintf("%s user %d, tok %s, created %v", isValid, s.UserID, s.Tok, s.CreatedAt)
 }
 
 // Login takes a users email and password, returning (sessionToken,error)
@@ -91,7 +101,8 @@ func (a *App) InitUserDB() error {
 	return a.DB_u.AutoMigrate(&User{}, &Session{})
 }
 
-// CreateUser creates in the DB a new user/account with `email`, `name` and hashed password `firstHash`.
+// CreateUser creates in the DB a new user/account with `email`, `name` and
+// hashed password `firstHash`.
 func (a *App) CreateUser(email string, name string, firstHash []byte) error {
 	// Generating a random salt isn't required, already handled by bcrypt
 	// Appending it to the base hash
@@ -149,7 +160,7 @@ func (a *App) ListUsersEmailClean(email string) ([]User, error) {
 	return users, err
 }
 
-// ExistsUser checks if a user with id `id` exists, returning (true,*User) if so.
+// ExistsUser checks if a user with ID `id` exists, returning (true,*User) if so.
 func (a *App) ExistsUser(id int) (bool, *User) {
 	user := &User{}
 	err := a.DB_u.First(user, id).Error
@@ -159,18 +170,13 @@ func (a *App) ExistsUser(id int) (bool, *User) {
 	return true, user
 }
 
-// DeleteUser deletes from the DB a user with email `email`
-// TODO: implement.
-func (a *App) DeleteUser(email string) error {
-	/*
-		var user User
-		err := a.DB_u.First(&user, 1).Error
-		errs.F_err(err)
-
-		err = a.DB_u.Delete(&user, 1).Error
-		errs.F_err(err)
-
-	*/
+// DeleteUser deletes from the DB a user with ID `id`
+func (a *App) DeleteUser(id int) error {
+	err := a.DB_u.Delete(&User{}, id).Error
+	if err != nil {
+		log.Println("[DeleteUser] error deleting user")
+		return err
+	}
 	return nil
 }
 
@@ -199,7 +205,7 @@ func (a *App) getSessionFromUser(userID int) (*Session, error) {
 	// First, get User
 	ok, u := a.ExistsUser(userID)
 	if !ok {
-		return nil, errors.New("invalid userID " + string(userID))
+		return nil, errors.New("invalid userID " + fmt.Sprint(userID))
 	}
 	s, err := a.getSessionFromTok(u.Tok)
 	if err != nil {
@@ -257,7 +263,7 @@ func (a *App) ExistsSession(tok string) bool {
 func (a *App) CreateSession(userID int) (string, error) {
 	ok, u := a.ExistsUser(userID)
 	if !ok {
-		return "", errors.New("invalid userID " + string(userID))
+		return "", errors.New("invalid userID " + fmt.Sprint(userID))
 	}
 	// Generate a new token
 	tok := uuid.UUID.String(uuid.New())
@@ -270,4 +276,37 @@ func (a *App) CreateSession(userID int) (string, error) {
 	u.Tok = tok
 	err = a.DB_u.Save(u).Error
 	return tok, err
+}
+
+// ListOpenSessions returns an array of valid Sessions.
+func (a *App) ListOpenSessions() ([]Session, error) {
+	var sessions []Session
+	err := a.DB_u.Find(&sessions).Error
+	// Array is traversed like this because the array is resized inside the loop
+	for i := 0; ; i++ {
+		if i >= len(sessions) {
+			// Reached end of list
+			break
+		}
+		if !sessions[i].Valid {
+			// Remove it from the returning array
+			sessions = removeSession(sessions, i)
+		}
+	}
+	return sessions, err
+}
+
+func (a *App) RefreshSession(tok string) error {
+	session, err := a.getSessionFromTok(tok)
+	if err != nil {
+		return err
+	}
+	err = a.DB_u.Save(&session).Error
+	return err
+}
+
+// removeSession removes the Session at pos `i` from the array.
+func removeSession(s []Session, i int) []Session {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
 }
