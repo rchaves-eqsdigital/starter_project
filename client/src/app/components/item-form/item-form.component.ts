@@ -1,4 +1,5 @@
 import { Component, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Logging } from 'src/app/logging/logging';
 import { ApiService } from '../../api.service';
 import { Item } from '../../data-structs/item';
 
@@ -77,7 +78,7 @@ export class ItemFormComponent implements OnInit {
    */
   public async formClick(): Promise<void> {
     let data = this.value.nativeElement.value; // TODO: do this with JSON ({fieldToEdit: newValue})
-    console.log(data);
+    Logging.log(data);
     if (data.length == 0) {
       alert("Invalid text.");
       return;

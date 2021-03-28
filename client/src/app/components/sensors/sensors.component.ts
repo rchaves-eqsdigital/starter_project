@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { environment } from 'src/environments/environment';
 import { ApiService } from '../../api.service';
 import { Logging } from '../../logging/logging';
 import { Sensor } from '../../data-structs/sensor';
@@ -31,7 +30,7 @@ export class SensorsComponent implements OnInit {
   getData(): void {
     this.apiService.getSensors()
         .subscribe((data) => {
-          if (!environment.production) { Logging.log("[sensors] Got data with len "+data.length); }
+          Logging.log("[sensors] Got data with len "+data.length);
           for (let i = 0; i < data.length; i++) {
             data[i] = new Sensor(null,data[i].ID,data[i].RoomID);
           }

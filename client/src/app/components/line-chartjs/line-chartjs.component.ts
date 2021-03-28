@@ -1,6 +1,5 @@
 import { Component, Input, ViewChild, ElementRef, OnInit, OnChanges } from '@angular/core';
 import * as chart from 'chart.js';
-import { environment } from 'src/environments/environment';
 import { Logging } from '../../logging/logging';
 
 /**
@@ -124,9 +123,7 @@ export class LineChartjsComponent implements OnInit, OnChanges {
   private rollUp(x_arr: number[], y_arr: number[]): {x: any, y: any}[] {
     let ret = [];
     if (x_arr.length != y_arr.length) {
-      if (!environment.production) {
-        Logging.log("x:"+x_arr+", y:"+y_arr);
-      }
+      Logging.log("x:"+x_arr+", y:"+y_arr);
       return null;
     }
     for (let i = 0; i < x_arr.length; i++) {

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { sha256 } from 'js-sha256';
 import { ApiService } from '../../api.service';
 import { CookieService } from 'ngx-cookie-service';
+import { Logging } from 'src/app/logging/logging';
 
 /**
  * Login screen.
@@ -57,7 +58,7 @@ export class LoginComponent implements OnInit {
     this.apiService.login(this.loginForm.value.email, password).then((x) => {
       document.getElementById("signIn").innerHTML = signIn_backup;
       if (x.error) {
-        console.log("Error logging in:",x.error);
+        Logging.log("Error logging in: "+x.error);
         // User already logged in.
         if (x.error.toString().includes("user already logged in")){
           this.router.navigateByUrl("sensors");  

@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { environment } from 'src/environments/environment';
 import { ApiService } from '../../api.service';
 import { DataEntry } from '../../data-structs/data-entry';
 import { Logging } from '../../logging/logging';
@@ -42,10 +41,10 @@ export class GraphComponent implements OnInit {
    * is filled with the returned data.
    */
   getData(): void {
-    if (!environment.production) { Logging.log(this.router.url); }
+    Logging.log(this.router.url);
     this.apiService.getSensorData(this.id)
         .subscribe((data) => {
-          if (!environment.production) { Logging.log("[graph] Got data with len "+data.length); }
+          Logging.log("[graph] Got data with len "+data.length);
           this.data = this.parseDataEntries(data);
         });
   }
@@ -64,7 +63,7 @@ export class GraphComponent implements OnInit {
       ret.x.push(e.Date);
       ret.y.push(e.Temp);
     }
-    if (!environment.production) { Logging.log("x["+ret.x.length+"] y["+ret.y.length+"]"); }
+    Logging.log("x["+ret.x.length+"] y["+ret.y.length+"]");
     return ret
   }
 }

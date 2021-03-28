@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
+import { Logging } from 'src/app/logging/logging';
 import { environment } from 'src/environments/environment';
 import { ApiService } from '../../api.service';
 
@@ -57,10 +58,10 @@ export class TopNavComponent implements OnInit {
     }
     this.apiService.logout().then((x) => {
       if (x.error || x.ok != "true") {
-        if (!environment.production) { console.log("Error logging out:",x.error); }
+        Logging.log("Error logging out: "+x.error);
       } else {
         // Logged out
-        if (!environment.production) { console.log("Logging out..."); }
+        Logging.log("Logging out...");
         this.girlScouts.delete("token");
         this.router.navigateByUrl("login");
       }

@@ -34,7 +34,7 @@ export class ApiService {
    */
   public getSensorData(id: string): Observable<DataEntry[]> {
     let url: string = environment.apiURL+`sensor/${id}/data`;
-    if (!environment.production) { Logging.log(url); }
+    Logging.log(url);
 
     return this.http.get<DataEntry[]>(url, this.requestOptions())
       .pipe(
@@ -50,7 +50,7 @@ export class ApiService {
    */
   public getSensors(): Observable<any[]> {
     let url: string = environment.apiURL+"sensor";
-    if (!environment.production) { Logging.log(url); }
+    Logging.log(url);
 
     return this.http.get<any[]>(url, this.requestOptions())
       .pipe(
@@ -66,11 +66,11 @@ export class ApiService {
    */
   public async getSensor(id: string): Promise<any> {
     let url: string = environment.apiURL+"sensor?id="+id;
-    if (!environment.production) { Logging.log(url); }
+    Logging.log(url);
 
     const data = await this.http.get<any>(url, this.requestOptions()).toPromise()
     let ret = new Sensor(null,data.ID,data.RoomID);
-    if (!environment.production) { Logging.log("[getSensor] Got item: "+ret); }
+    Logging.log("[getSensor] Got item: "+ret);
     return ret;
   }
 
@@ -81,7 +81,7 @@ export class ApiService {
    */
   public getUsers(): Observable<any[]> {
     let url: string = environment.apiURL+"user";
-    if (!environment.production) { Logging.log(url); }
+    Logging.log(url);
 
     return this.http.get<any[]>(url, this.requestOptions())
       .pipe(
@@ -97,11 +97,11 @@ export class ApiService {
    */
   public async getUser(id: string): Promise<any> {
     let url: string = environment.apiURL+"user?id="+id;
-    if (!environment.production) { Logging.log(url); }
+    Logging.log(url);
 
     const data = await this.http.get<any>(url, this.requestOptions()).toPromise()
     let ret = new User(null,data.Name,data.Email,id);
-    if (!environment.production) { Logging.log("[getUser] Got item: "+ret); }
+    Logging.log("[getUser] Got item: "+ret);
     return ret;
   }
 

@@ -1,3 +1,4 @@
+import { environment } from 'src/environments/environment';
 import { Browser } from '../data-structs/browser-types';
 
 /**
@@ -16,7 +17,9 @@ export class Logging {
       } else {
         caller = "undefined";
       }
-      console.log(`[${caller}] ${s}`)
+      if (!environment.production) {
+        console.log(`[${caller}] ${s}`);
+      }
     }
 
     /**
@@ -29,7 +32,6 @@ export class Logging {
         // matches this function, the caller and the parent
         const allMatches = e.stack.match(/(\w+)@|at (\w+) \(/g);
         // match parent function name
-        console.log(allMatches);
         const parentMatches = allMatches[2].match(/(\w+)@|at (\w+) \(/);
         // return only name
         return parentMatches[1] || parentMatches[2];
