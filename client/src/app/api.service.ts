@@ -114,11 +114,20 @@ export class ApiService {
      public async getUserFromTok(tok: string): Promise<any> {
       let url: string = environment.apiURL+"user?tok="+tok;
       Logging.log(url);
-  
-      const data = await this.http.get<any>(url, this.requestOptions()).toPromise()
-      let ret = new User(null,data.Name,data.Email,data.ID);
-      Logging.log("[getUser] Got item: "+ret);
-      return ret;
+      let data = undefined;
+      await this.http.get<any>(url, this.requestOptions()).toPromise().then(x => {
+        data = x;
+      })
+      Logging.log(data);
+      if (typeof data === "undefined") {
+        Logging.log("[getUserFromTok] didn't receive anything");
+        let ret = new User(null,"User","email","id");  
+        return ret;
+      } else {
+        let ret = new User(null,data.Name,data.Email,data.ID);
+        Logging.log("[getUserFromTok] Got item: "+ret.getName());
+        return ret;
+      }
     }
 
   /**
