@@ -318,6 +318,9 @@ func (a *App) GetUserFromPartialTok(tok string) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Clean user
+	user.Password = nil
+	user.Tok = ""
 	return user, nil
 }
 
