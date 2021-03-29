@@ -31,6 +31,17 @@ export class User implements Item {
         return this.Pic === null ? "" : this.Pic;
     }
 
+    /*
+    // TS getters and setters
+    public get Pic2(): String {
+        return this.Pic;
+    }
+
+    public set Pic2(x: String) {
+        this.Pic = x;
+    }
+    */
+
     /**
      * `this.Name` getter.
      */
