@@ -39,6 +39,7 @@ make clean && make && bin/server
 - Login/Logout with sessions and session token
 - 401 (Unauthorized) and 404 pages
 - Every page requires authentication (except */login*). Not the page in the client, directly, but every page that is heavily based on API requests that requires authentication.
+- Ability to create and register new users.
 
 ### Client
 - Icon based bottom-nav, showing what screen is currently active.
@@ -64,6 +65,7 @@ make clean && make && bin/server
 - The [sensor](client/src/app/components/sensors/sensors.component.html) and [user](client/src/app/components/users/users.component.html) components have too many things in common, should be generalized.
 - Dark mode switch doesn't keep its state when the route changes.
 - Navigating to */login* when logged in deletes the session cookie. Bug or feature?
+- The ["Add" form](client/src/app/components/float-button/float-button.component.ts) uses the `<br/>` element instead of CSS for line separation. It also uses duplicate code from the edit form.
 
 ### Server
 - Global `App` variable available across every file in the package. Implement using a singleton, perhaps?
@@ -82,7 +84,4 @@ make clean && make && bin/server
 
 ### Client + Server
 - Implement chunked requests for `apiSensorData`. At the moment if there are 10MB of sensor data, they are returned at once, and displayed in the charts at once.
-- Implement "Add user"
-- Implement "Add sensor"
-- Implement "Add sensor data"
 - Implement "Delete user"

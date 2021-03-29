@@ -97,7 +97,7 @@ export class TopNavComponent implements OnInit {
     this.apiService.getUserFromTok(partial_token).then(response => {
       // Fill "username" with username
       document.getElementById("username").innerHTML = response.Name;
-    });
+    }).catch(e => Logging.log(e));
   }
 
 }

@@ -117,8 +117,7 @@ export class ApiService {
       let data = undefined;
       await this.http.get<any>(url, this.requestOptions()).toPromise().then(x => {
         data = x;
-      })
-      Logging.log(data);
+      }).catch(e => Logging.log(e));
       if (typeof data === "undefined") {
         Logging.log("[getUserFromTok] didn't receive anything");
         let ret = new User(null,"User","email","id");  
@@ -139,6 +138,19 @@ export class ApiService {
    */
   public edit(type: string, data:any): Promise<any> {
     return this.http.post(environment.apiURL+type+"/edit",data, this.requestOptions()).toPromise();
+  }
+
+  /**
+   * Create a new user.
+   * 
+   * @param name - User name
+   * @param email - User email
+   * @param password - User password (hash)
+   * @returns Promise not used.
+   */
+  public addUser(name: string, email: string, password: string): Promise<any> {
+    let data = {"name":name, "email":email, "password": password};
+    return this.http.post(environment.apiURL+"user/add", JSON.stringify(data), this.requestOptions()).toPromise();
   }
 
   /**

@@ -1,4 +1,23 @@
 <div>
-    <input id="triggerButton" class="triggerButton" type="checkbox"/>
+    <button id="triggerButton" class="triggerButton"></button>
     <label for="triggerButton"></label>
+</div>
+
+<div id="myModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+        <span id="close" class="close">&times;</span>
+        <h3>Create a new user</h3>
+        <form>
+            <label for="namebox">Name: </label><input #namebox type="text">
+            <br/> <!-- Bad, I know, should use CSS.-->
+            <label for="emailbox">Email: </label><input #emailbox type="text">
+            <br/>
+            <label for="passbox">Password: </label><input #passbox type="text">
+            <br/>
+            <input id="btn" type="button" value="Save" (click)="formClick()">
+        </form>
+    </div>
+
 </div>

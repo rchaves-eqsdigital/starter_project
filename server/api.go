@@ -248,11 +248,27 @@ func apiUserData(w http.ResponseWriter, r *http.Request, id int) {
 
 // apiUserAdd is the handler for `/api/v0/user/add`.
 // Add user.
-// TODO.
 func apiUserAdd(w http.ResponseWriter, r *http.Request, id int) {
 	if !corsAndAuth(&w, r) {
 		return
 	}
+	body, err := getPostBody(r)
+	if err != nil {
+		sendError(w, err)
+		return
+	}
+	log.Printf("[%s] received %s", r.URL.Path, body)
+	var hash []byte
+	hash, err = hex.DecodeString(body["password"])
+	err = a.CreateUser(body["email"], body["name"], hash[:])
+	if err != nil {
+		sendError(w, err)
+		return
+	}
+	log.Printf("[%s] User created!", r.URL.Path)
+	ret := make(map[string]string)
+	ret["ok"] = "true"
+	sendAsJson(w, ret)
 }
 
 // apiSensorEdit is the handler for `/api/v0/sensor/edit`.
