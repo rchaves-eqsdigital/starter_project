@@ -1,10 +1,10 @@
 <ul class="items">
     <ng-container *ngFor="let item of items">
-    <a routerLink="{{this.href}}/{{item.getID()}}">
+    <a routerLink="{{href}}/{{item.getID()}}">
         <li>
             <img *ngIf="item.getPic().length != 0; else emptyPic" [src]="item.getPic()"/>
             <ng-template #emptyPic>
-                <i class="fa {{this.defaultIcon}}"></i>
+                <i class="fa {{defaultIcon}}"></i>
             </ng-template>
             <span>{{item.getTitle()}}</span>
         </li>

@@ -92,7 +92,7 @@ export class TopNavComponent implements OnInit {
    */
   private updateUsername(): void {
     // Get username from token
-    console.log(this.girlScouts.get("token"));
+    Logging.log(this.girlScouts.get("token"));
     let partial_token = this.girlScouts.get("token").substring(0,8);
     this.apiService.getUserFromTok(partial_token).then(response => {
       // Fill "username" with username

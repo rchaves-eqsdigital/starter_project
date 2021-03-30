@@ -58,6 +58,10 @@ make clean && make && bin/server
 
 ----------
 ## Known Issues / Bad Software
+### Client+Server
+- When creating a new user client-side, multiple users with the same credentials can be created.
+- When editing a user's email, it can be changed to an already existing email in another user.
+
 ### Client
 - ["Edit forms"](client/src/app/components/item-form) are not dynamic, only allowing one field to be changed.
 - ["Item details"](client/src/app/components/item-details/item-details.component.ts) component is only semi-generic, as it supports sensors and users, but hardcoded.

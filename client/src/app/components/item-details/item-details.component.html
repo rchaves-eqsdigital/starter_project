@@ -1,4 +1,4 @@
-<app-top-nav back="{{this.getBack()}}"></app-top-nav>
+<app-top-nav back="{{getBack()}}"></app-top-nav>
 <div class="content" *ngIf="item; else errorBlock">
     <img src="{{item.getPic()}}"/>
     <h2>{{item.getTitle()}}</h2>
@@ -7,9 +7,9 @@
         <span id="data_ok" class="status"><i class="fa fa-check-circle"></i></span>
         <span id="data_bad" class="status"><i class="fa fa-times"></i></span>
     </div>
-    <app-item-form [item]="item" [type]="this.getType()" [id]="this.getID()"
-    (onClose)="this.formClosed($event)"></app-item-form>
-    <app-graph *ngIf="this.getType()=='sensor'" [id]="this.getID()"></app-graph>
+    <app-item-form [item]="item" [type]="getType()" [id]="getID()"
+    (onClose)="formClosed($event)"></app-item-form>
+    <app-graph *ngIf="getType()=='sensor'" [id]="getID()"></app-graph>
 </div>
 <ng-template #errorBlock>
     <div class="content">
